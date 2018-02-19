@@ -1,7 +1,7 @@
 # pympw
 
 pympw is a master password generation tool based on
-[https://github.com/Lyndir/MasterPassword](Master Password). I loved the idea,
+[Master Password](https://github.com/Lyndir/MasterPassword). I loved the idea,
 and I wanted to try writing my own (unofficial) version of it.
 
 ## Installation
@@ -27,7 +27,7 @@ then enter your master password when prompted. Here are a few examples:
 	Master Password:
 	Site Password: n5:@PVWg&g9ACZz8fdCh
 
-For more usage of Master Password, see [http://masterpasswordapp.com/](here).
+For more usage of Master Password, see [here](http://masterpasswordapp.com/).
 
 ## Features
 
