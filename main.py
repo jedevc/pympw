@@ -61,7 +61,7 @@ def main():
     if args.quiet:
         print(site_password)
     else:
-        print('Password: {}'.format(site_password))
+        print('Site Password: {}'.format(site_password))
 
 def master_password_app(name, master_password, template, site, counter):
     '''
@@ -189,14 +189,14 @@ TEMPLATE_TYPES = {
 }
 CHARACTER_GROUPS = {
     'V': 'AEIOU',
-    'v': 'aeiou',
     'C': 'BCDFGHJKLMNPQRSTVWXYZ',
+    'v': 'aeiou',
     'c': 'bcdfghjklmnpqrstvwxyz',
     'A': 'AEIOUBCDFGHJKLMNPQRSTVWXYZ',
     'a': 'AEIOUaeiouBCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz',
     'n': '0123456789',
     'o': "@&%?,=[]_:-+*$#!'^~;()/.",
-    'X': "AEIOUaeiouBCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz0123456789!@#$%^&*()"
+    'x': "AEIOUaeiouBCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz0123456789!@#$%^&*()"
 }
 
 # call main function
