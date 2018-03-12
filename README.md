@@ -6,24 +6,26 @@ and I wanted to try writing my own (unofficial) version of it.
 
 ## Installation
 
-Currently there are no neat installation instructions :(
+Setting up pympw is simple.
 
-However, you can setup pympw by running the development instructions below.
+	$ python setup.py install
+
+Done!
 
 ## Usage
 
 Running pympw is simple. Provide the commandline arguments that you need, and
 then enter your master password when prompted. Here are a few examples:
 
-	$ python main.py 'James Smith' github.com  # generate a password
+	$ mpw 'James Smith' github.com  # generate a password
 	Master Password:
 	Site Password: XamiJeqaDiku5[
 
-	$ python main.py 'James Smith' github.com -c 3  # generate a password with an explicit site counter
+	$ mpw 'James Smith' github.com -c 3  # generate a password with an explicit site counter
 	Master Password:
 	Site Password: CeyhCosaYoru7@
 
-	$ python main.py 'James Smith' github.com -t maximum  # generate a maximum security password
+	$ mpw 'James Smith' github.com -t maximum  # generate a maximum security password
 	Master Password:
 	Site Password: n5:@PVWg&g9ACZz8fdCh
 
