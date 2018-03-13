@@ -43,25 +43,32 @@ def main():
             default = 'long', help = 'The type of password to generate')
     parser.add_argument('-c', '--counter', type = int, default = 1,
             help = "The site's password counter")
-    parser.add_argument('-q', '--quiet', action = 'store_true',
-            help = 'Suppress excess output')
+
+    parser.add_argument('-p', '--prompt', action = 'store_true',
+            help = "Display a password entry prompt")
+
+    parser.add_argument('-l', '--login', action = 'store_true',
+            help = 'Print out the username along with the password')
+
     args = parser.parse_args()
 
     # get master password
-    if args.quiet:
-        password = getpass('')
-    else:
+    if args.prompt:
         password = getpass('Master Password: ')
+    else:
+        password = getpass('')
 
     # generate site password
     site_password = master_password_app(args.name, password, args.template,
             args.site, args.counter)
 
     # output master password
-    if args.quiet:
-        print(site_password)
-    else:
+    if args.prompt:
+        if args.login: print('Username: {}'.format(args.name))
         print('Site Password: {}'.format(site_password))
+    else:
+        if (args.login): print(args.name)
+        print(site_password)
 
 def master_password_app(name, master_password, template, site, counter):
     '''

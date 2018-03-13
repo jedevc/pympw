@@ -17,15 +17,15 @@ Done!
 Running pympw is simple. Provide the commandline arguments that you need, and
 then enter your master password when prompted. Here are a few examples:
 
-	$ mpw 'James Smith' github.com  # generate a password
+	$ mpw -p 'James Smith' github.com  # generate a password
 	Master Password:
 	Site Password: XamiJeqaDiku5[
 
-	$ mpw 'James Smith' github.com -c 3  # generate a password with an explicit site counter
+	$ mpw -p 'James Smith' github.com -c 3  # generate a password with an explicit site counter
 	Master Password:
 	Site Password: CeyhCosaYoru7@
 
-	$ mpw 'James Smith' github.com -t maximum  # generate a maximum security password
+	$ mpw -p 'James Smith' github.com -t maximum  # generate a maximum security password
 	Master Password:
 	Site Password: n5:@PVWg&g9ACZz8fdCh
 
