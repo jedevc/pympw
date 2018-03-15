@@ -8,6 +8,8 @@ and I wanted to try writing my own (unofficial) version of it.
 
 Setting up pympw is simple.
 
+	$ git clone https://github.com/jedevc/pympw.git
+	$ cd pympw
 	$ python setup.py install
 
 Done!
