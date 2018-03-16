@@ -37,38 +37,27 @@ def main():
     # parse argv
     parser = argparse.ArgumentParser(description = 'Generate a password according to the MasterPasswordApp algorithm.')
 
-    parser.add_argument('name', help = 'Your name (used as a salt)')
-    parser.add_argument('site', help = 'The name of the website')
+    parser.add_argument('-n', '--name', help = 'Your name (used as a salt)')
+    parser.add_argument('-s', '--site', help = 'The name of the website')
     parser.add_argument('-t', '--template', choices = TEMPLATE_TYPES.keys(),
             default = 'long', help = 'The type of password to generate')
     parser.add_argument('-c', '--counter', type = int, default = 1,
             help = "The site's password counter")
 
-    parser.add_argument('-p', '--prompt', action = 'store_true',
-            help = "Display a password entry prompt")
-
-    parser.add_argument('-l', '--login', action = 'store_true',
-            help = 'Print out the username along with the password')
-
     args = parser.parse_args()
 
+    name = args.name or input('Name: ')
+    site = args.site or input('Site: ')
+
     # get master password
-    if args.prompt:
-        password = getpass('Master Password: ')
-    else:
-        password = getpass('')
+    password = getpass('Master Password: ')
 
     # generate site password
-    key = generate_master_key(password, args.name)
-    site_password = generate_password(key, args.site, args.counter, args.template)
+    key = generate_master_key(password, name)
+    site_password = generate_password(key, site, args.counter, args.template)
 
     # output site password
-    if args.prompt:
-        if args.login: print('Username: {}'.format(args.name))
-        print('Site Password: {}'.format(site_password))
-    else:
-        if (args.login): print(args.name)
-        print(site_password)
+    print('Site Password: "{}"'.format(site_password))
 
 def generate_master_key(master_password, salt_string):
     '''
