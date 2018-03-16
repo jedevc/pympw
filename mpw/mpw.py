@@ -127,9 +127,12 @@ def generate_password(seed, template_type):
     # generate password from template
     site_password = []
     for i, tchar in enumerate(template):
-        pchars = CHARACTER_GROUPS[tchar]
-        pchar = pchars[seed[i + 1] % len(pchars)]
-        site_password.append(pchar)
+        if tchar == ' ':
+            site_password.append(tchar)
+        else:
+            pchars = CHARACTER_GROUPS[tchar]
+            pchar = pchars[seed[i + 1] % len(pchars)]
+            site_password.append(pchar)
 
     return ''.join(site_password)
 
@@ -192,6 +195,14 @@ TEMPLATE_TYPES = {
     ],
     'pin': [
         'nnnn'
+    ],
+    'name': [
+        'cvccvcvcv'
+    ],
+    'phrase': [
+        'cvcc cvc cvccvcv cvc',
+        'cvc cvccvcvcv cvcv',
+        'cv cvccv cvc cvcvccv'
     ]
 }
 CHARACTER_GROUPS = {
