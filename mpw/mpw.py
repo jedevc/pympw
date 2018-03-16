@@ -59,10 +59,10 @@ def main():
         password = getpass('')
 
     # generate site password
-    site_password = master_password_app(args.name, password, args.template,
-            args.site, args.counter)
+    key = generate_master_key(password, args.name)
+    site_password = generate_password(key, args.site, args.counter, args.template)
 
-    # output master password
+    # output site password
     if args.prompt:
         if args.login: print('Username: {}'.format(args.name))
         print('Site Password: {}'.format(site_password))
@@ -70,26 +70,7 @@ def main():
         if (args.login): print(args.name)
         print(site_password)
 
-def master_password_app(name, master_password, template, site, counter):
-    '''
-    Generate a site password from the provided parameters.
-    '''
-
-    salt = generate_salt(name)
-    key = generate_master_key(master_password, salt)
-    seed = generate_seed(key, site, counter)
-    site_password = generate_password(seed, template)
-
-    return site_password
-
-def generate_salt(string):
-    '''
-    Generate a salt for the hashing algorithm.
-    '''
-
-    return utf8(PACKAGE_NAME) + uint_32(len(string)) + utf8(string)
-
-def generate_master_key(master_password, salt):
+def generate_master_key(master_password, salt_string):
     '''
     Generate the master key using the scrypt algorithm.
 
@@ -97,28 +78,22 @@ def generate_master_key(master_password, salt):
     provided salt.
     '''
 
+    salt = utf8(PACKAGE_NAME) + uint_32(len(salt_string)) + utf8(salt_string)
     key = scrypt.hash(utf8(master_password), salt, 32768, 8, 2, 64)
+
     return key
 
-def generate_seed(key, site, counter):
-    '''
-    Generate a seed used for the final site password generation.
-
-    The seed is the result of applying the HMAC-SHA256 algorithm to a message
-    generated from the site details.
-    '''
-
-    msg = utf8(PACKAGE_NAME) + uint_32(len(site)) + utf8(site) + uint_32(counter)
-    seed = HMAC.new(key, msg, SHA256)
-    return seed.digest()
-
-def generate_password(seed, template_type):
+def generate_password(key, site, counter, template_type):
     '''
     Generate a site password using the seed and the template type.
 
     The template is iterated through, using the seed to generate characters
     within a range determined by the template.
     '''
+
+    # generate the seed
+    msg = utf8(PACKAGE_NAME) + uint_32(len(site)) + utf8(site) + uint_32(counter)
+    seed = HMAC.new(key, msg, SHA256).digest()
 
     # select template
     templates = TEMPLATE_TYPES[template_type]
@@ -217,6 +192,5 @@ CHARACTER_GROUPS = {
     'x': "AEIOUaeiouBCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz0123456789!@#$%^&*()"
 }
 
-# call main function
 if __name__ == "__main__":
     main()
