@@ -24,6 +24,7 @@
 #
 
 import argparse
+import subprocess
 from getpass import getpass
 
 from Crypto.Hash import HMAC, SHA256
@@ -34,15 +35,21 @@ def main():
     Wrap master_password_app function by providing a neat argparse interface.
     '''
 
-    # parse argv
     parser = argparse.ArgumentParser(description = 'Generate a password according to the MasterPasswordApp algorithm.')
 
+    # input options
     parser.add_argument('-n', '--name', help = 'Your name (used as a salt)')
     parser.add_argument('-s', '--site', help = 'The name of the website')
     parser.add_argument('-t', '--template', choices = TEMPLATE_TYPES.keys(),
             default = 'long', help = 'The type of password to generate')
     parser.add_argument('-c', '--counter', type = int, default = 1,
             help = "The site's password counter")
+
+    # output options
+    parser.add_argument('-p', '--print', action = 'store_true',
+            help = "Print the password to stdout")
+    parser.add_argument('-x', '--cut', action = 'store_true',
+            help = 'Paste the password to the system clipboard')
 
     args = parser.parse_args()
 
@@ -57,7 +64,10 @@ def main():
     site_password = generate_password(key, site, args.counter, args.template)
 
     # output site password
-    print('Site Password: "{}"'.format(site_password))
+    if args.print:
+        print('Site Password: "{}"'.format(site_password))
+    if args.cut:
+        clipboard_copy(site_password)
 
 def generate_master_key(master_password, salt_string):
     '''
@@ -99,6 +109,14 @@ def generate_password(key, site, counter, template_type):
             site_password.append(pchar)
 
     return ''.join(site_password)
+
+def clipboard_copy(data):
+    '''
+    Utility function to copy a string to the system clipboard.
+    '''
+
+    proc = subprocess.run(['xsel', '-bi'], input=utf8(data))
+    proc.check_returncode()
 
 def uint_32(i):
     '''
