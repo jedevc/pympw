@@ -31,10 +31,6 @@ from Crypto.Hash import HMAC, SHA256
 import scrypt
 
 def main():
-    '''
-    Wrap master_password_app function by providing a neat argparse interface.
-    '''
-
     parser = argparse.ArgumentParser(description = 'Generate a password according to the MasterPasswordApp algorithm.')
 
     # input options
@@ -70,8 +66,12 @@ def generate_master_key(master_password, salt_string):
     '''
     Generate the master key using the scrypt algorithm.
 
-    The master key is the result of hashing the master password along with the
-    provided salt.
+    Args:
+        master_password: The secret string used to derive the key.
+        salt_string: A less-secret string used to improve the key's security.
+
+    Returns:
+        The master key.
     '''
 
     salt = utf8(PACKAGE_NAME) + uint_32(len(salt_string)) + utf8(salt_string)
@@ -81,10 +81,13 @@ def generate_master_key(master_password, salt_string):
 
 def generate_password(key, site, counter, template_type):
     '''
-    Generate a site password using the seed and the template type.
+    Generate a site password using the master key and the site data.
 
-    The template is iterated through, using the seed to generate characters
-    within a range determined by the template.
+    Args:
+        key: The master key.
+        site: The site's name.
+        counter: The password version to generate.
+        template_type: The type of password template to use.
     '''
 
     # generate the seed
@@ -110,27 +113,22 @@ def generate_password(key, site, counter, template_type):
 def clipboard_copy(data):
     '''
     Utility function to copy a string to the system clipboard.
+
+    Args:
+        data: The data to copy to the clipboard.
     '''
 
     proc = subprocess.run(['xsel', '-bi'], input=utf8(data))
     proc.check_returncode()
 
 def uint_32(i):
-    '''
-    Utility function to convert unsigned integer to bytes
-    '''
-
     return i.to_bytes(4, 'big')
 
 def utf8(s):
-    '''
-    Utility function to convert string to utf-8 encoded bytes
-    '''
-
     return s.encode('UTF-8')
 
 # the following constants are taken directly from
-# http://masterpasswordapp.com/algorithm.html
+# https://github.com/Lyndir/MasterPassword/blob/master/core/c/mpw-types.c
 PACKAGE_NAME = 'com.lyndir.masterpassword'
 TEMPLATE_TYPES = {
     'maximum': [

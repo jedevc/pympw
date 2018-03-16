@@ -21,25 +21,23 @@ then enter your master password when prompted. Here are a few examples:
 
 	$ mpw -p 'James Smith' github.com  # generate a password
 	Master Password:
-	Site Password: XamiJeqaDiku5[
+	Site Password: "XamiJeqaDiku5["
 
 	$ mpw -p 'James Smith' github.com -c 3  # generate a password with an explicit site counter
 	Master Password:
-	Site Password: CeyhCosaYoru7@
+	Site Password: "CeyhCosaYoru7@"
 
 	$ mpw -p 'James Smith' github.com -t maximum  # generate a maximum security password
 	Master Password:
-	Site Password: n5:@PVWg&g9ACZz8fdCh
+	Site Password: "n5:@PVWg&g9ACZz8fdCh"
 
 For more usage of Master Password, see [here](http://masterpasswordapp.com/).
 
-## Features
+## Goals
 
-- [x] Generate passwords
-- [x] Command line interface
-- [x] Increase counter
-- [ ] Multiple versions of algorithm
-- [ ] Storage of sites and passwords
+- Other algorithm versions
+- Master key caching
+- Storage of site data
 
 ## Development
 
