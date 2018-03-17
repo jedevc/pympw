@@ -1,9 +1,19 @@
 #!/bin/bash
 
 ###
-# Simple tool to insert an mpw password anywhere.
+# Simple tool to create a pop-up window to generate an MPW password.
+#
+# To use, simply add a keybinding for mpw-prompt using your window manager's
+# preferred method.
+#
+# Dependencies:
+# 	xterm              - pop-up terminal
+# 	xsel               - copying to the clipboard
+#   xdotool (optional) - window highlighting magic
 
-WINDOW=`xdotool getactivewindow`
+if type xdotool > /dev/null; then
+	WINDOW=`xdotool getactivewindow`
+fi
 
 echo -n | xsel -bi
 
@@ -18,4 +28,6 @@ mpw $name $site -t $template -c $counter -x
 if [ $? -ne 0 ]; then read; fi
 '
 
-xdotool windowactivate $WINDOW key 'ctrl+shift+v'
+if type xdotool > /dev/null; then
+	xdotool windowactivate $WINDOW key 'ctrl+shift+v'
+fi
