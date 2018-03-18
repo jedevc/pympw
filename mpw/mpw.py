@@ -28,7 +28,7 @@ import subprocess
 from getpass import getpass
 
 from . import algorithm
-from .algorithm import generate_master_key, generate_password
+from .algorithm import Algorithm
 
 def main():
     parser = argparse.ArgumentParser(description = 'Generate a password according to the MasterPasswordApp algorithm.')
@@ -41,6 +41,9 @@ def main():
             help = 'The type of password to generate')
     parser.add_argument('-c', '--counter', type = int, default = 1,
             help = "The site's password counter")
+    parser.add_argument('-v', '--version', type = int, default = 3,
+            choices = [1, 2, 3],
+            help = 'Version of the master password algorithm to use')
 
     # output options
     parser.add_argument('-p', '--print', action = 'store_true',
@@ -54,8 +57,10 @@ def main():
     password = getpass('Master Password: ')
 
     # generate site password
-    key = generate_master_key(password, args.name)
-    site_password = generate_password(key, args.site, args.counter, args.template)
+    gen = Algorithm(args.version)
+    key = gen.master_key(password, args.name)
+    site_seed = gen.site_seed(key, args.site, args.counter)
+    site_password = gen.site_password(site_seed, args.template)
 
     # output site password
     if args.print:
