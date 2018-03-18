@@ -36,8 +36,8 @@ def main():
     # input options
     parser.add_argument('name', help = 'Your name (used as a salt)')
     parser.add_argument('site', help = 'The name of the website')
-    parser.add_argument('-t', '--template', choices =
-            algorithm.TEMPLATE_TYPES.keys(), default = 'long',
+    parser.add_argument('-t', '--template', default = 'long',
+            choices = algorithm.TEMPLATE_TYPES.keys(),
             help = 'The type of password to generate')
     parser.add_argument('-c', '--counter', type = int, default = 1,
             help = "The site's password counter")
