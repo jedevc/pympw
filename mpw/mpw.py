@@ -42,7 +42,7 @@ def main():
     parser.add_argument('-c', '--counter', type = int, default = 1,
             help = "The site's password counter")
     parser.add_argument('-v', '--version', type = int, default = 3,
-            choices = [1, 2, 3],
+            choices = [0, 1, 2, 3],
             help = 'Version of the master password algorithm to use')
 
     # output options

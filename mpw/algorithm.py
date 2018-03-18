@@ -12,7 +12,9 @@ def Algorithm(version):
         An algorithm object.
     '''
 
-    if version == 1:
+    if version == 0:
+        return AlgorithmV0
+    elif version == 1:
         return AlgorithmV1
     elif version == 2:
         return AlgorithmV2
@@ -59,7 +61,7 @@ class AlgorithmBase:
 
         pass
 
-class AlgorithmV1(AlgorithmBase):
+class AlgorithmV0(AlgorithmBase):
     def master_key(master_password, salt_string):
         salt = utf8(PACKAGE_NAME) + \
                uint_32(len(salt_string)) + \
@@ -75,6 +77,28 @@ class AlgorithmV1(AlgorithmBase):
         seed = HMAC.new(key, msg, SHA256).digest()
         return seed
 
+    def site_password(seed, template_type):
+        seed = list(seed)
+        for i, v in enumerate(seed):
+            # ported this operation from js to python
+            # https://github.com/tmthrgd/mpw-js/blob/master/mpw.js#L219
+            seed[i] = (0x00ff if v > 127 else 0x0000) | (v << 8)
+
+        templates = TEMPLATE_TYPES[template_type]
+        template = templates[seed[0] % len(templates)]
+
+        password = []
+        for i, tchar in enumerate(template):
+            if tchar == ' ':
+                password.append(tchar)
+            else:
+                pchars = CHARACTER_GROUPS[tchar]
+                pchar = pchars[seed[i + 1] % len(pchars)]
+                password.append(pchar)
+
+        return ''.join(password)
+
+class AlgorithmV1(AlgorithmV0):
     def site_password(seed, template_type):
         templates = TEMPLATE_TYPES[template_type]
         template = templates[seed[0] % len(templates)]
