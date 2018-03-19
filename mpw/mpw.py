@@ -31,19 +31,19 @@ from . import algorithm
 from .algorithm import Algorithm
 
 def main():
-    parser = argparse.ArgumentParser(description = 'Generate a password according to the MasterPasswordApp algorithm.')
+    parser = argparse.ArgumentParser(description = 'Generate a password using the MasterPassword algorithm.')
 
     # input options
-    parser.add_argument('name', help = 'Your name (used as a salt)')
-    parser.add_argument('site', help = 'The name of the website')
+    parser.add_argument('name', help = 'Your full name')
+    parser.add_argument('site', help = 'The site name')
     parser.add_argument('-t', '--template', default = 'long',
             choices = algorithm.TEMPLATE_TYPES.keys(),
-            help = 'The type of password to generate')
+            help = 'The password type template')
     parser.add_argument('-c', '--counter', type = int, default = 1,
             help = "The site's password counter")
     parser.add_argument('-v', '--version', type = int, default = 3,
             choices = [0, 1, 2, 3],
-            help = 'Version of the master password algorithm to use')
+            help = 'MasterPassword algorithm version')
 
     # output options
     parser.add_argument('-p', '--print', action = 'store_true',
