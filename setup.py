@@ -1,9 +1,15 @@
 from setuptools import setup
 
+with open('README.md') as f:
+    long_description = f.read()
+
 setup(
     name='pympw',
     version='0.1',
     description='A python implementation of the Master Password algorithm.',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
+
     url='https://github.com/jedevc/pympw',
     author='Justin Chadwell',
     license='GPL3',
