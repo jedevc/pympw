@@ -1,53 +1,135 @@
 from Crypto.Hash import HMAC, SHA256
 import scrypt
 
-def generate_master_key(master_password, salt_string):
+def Algorithm(version):
     '''
-    Generate the master key using the scrypt algorithm.
+    Create an algorithm object to do all the master password operations.
 
     Args:
-        master_password: The secret string used to derive the key.
-        salt_string: A less-secret string used to improve the key's security.
+        version: The algorithm version to create.
 
     Returns:
-        The master key.
+        An algorithm object.
     '''
 
-    salt = utf8(PACKAGE_NAME) + uint_32(len(salt_string)) + utf8(salt_string)
-    key = scrypt.hash(utf8(master_password), salt, 32768, 8, 2, 64)
+    if version == 0:
+        return AlgorithmV0
+    elif version == 1:
+        return AlgorithmV1
+    elif version == 2:
+        return AlgorithmV2
+    elif version == 3:
+        return AlgorithmV3
+    else:
+        raise ValueError('invalid version')
 
-    return key
+class AlgorithmBase:
+    def master_key(master_password, salt_string):
+        '''
+        Generate the master key.
 
-def generate_password(key, site, counter, template_type):
-    '''
-    Generate a site password using the master key and the site data.
+        Args:
+            master_password: A secret string used to derive the key.
+            salt_string: A string used to improve the key's security.
 
-    Args:
-        key: The master key.
-        site: The site's name.
-        counter: The password version to generate.
-        template_type: The type of password template to use.
-    '''
+        Returns:
+            The master key.
+        '''
 
-    # generate the seed
-    msg = utf8(PACKAGE_NAME) + uint_32(len(site)) + utf8(site) + uint_32(counter)
-    seed = HMAC.new(key, msg, SHA256).digest()
+        pass
 
-    # select template
-    templates = TEMPLATE_TYPES[template_type]
-    template = templates[seed[0] % len(templates)]
+    def site_seed(key, site, counter):
+        '''
+        Generate a site password generation seed.
 
-    # generate password from template
-    site_password = []
-    for i, tchar in enumerate(template):
-        if tchar == ' ':
-            site_password.append(tchar)
-        else:
-            pchars = CHARACTER_GROUPS[tchar]
-            pchar = pchars[seed[i + 1] % len(pchars)]
-            site_password.append(pchar)
+        Args:
+            key: The master key.
+            site: The site's name.
+            counter: The password version to generate.
+        '''
 
-    return ''.join(site_password)
+        pass
+
+    def site_password(seed, template_type):
+        '''
+        Generate a site password.
+
+        Args:
+            seed: The password generation seed.
+            template_type: The type of password to generate.
+        '''
+
+        pass
+
+class AlgorithmV0(AlgorithmBase):
+    def master_key(master_password, salt_string):
+        salt = utf8(PACKAGE_NAME) + \
+               uint_32(len(salt_string)) + \
+               utf8(salt_string)
+        key = scrypt.hash(utf8(master_password), salt, 32768, 8, 2, 64)
+        return key
+
+    def site_seed(key, site, counter):
+        msg = utf8(PACKAGE_NAME) + \
+              uint_32(len(site)) + \
+              utf8(site) + \
+              uint_32(counter)
+        seed = HMAC.new(key, msg, SHA256).digest()
+        return seed
+
+    def site_password(seed, template_type):
+        seed = list(seed)
+        for i, v in enumerate(seed):
+            # ported this operation from js to python
+            # https://github.com/tmthrgd/mpw-js/blob/master/mpw.js#L219
+            seed[i] = (0x00ff if v > 127 else 0x0000) | (v << 8)
+
+        templates = TEMPLATE_TYPES[template_type]
+        template = templates[seed[0] % len(templates)]
+
+        password = []
+        for i, tchar in enumerate(template):
+            if tchar == ' ':
+                password.append(tchar)
+            else:
+                pchars = CHARACTER_GROUPS[tchar]
+                pchar = pchars[seed[i + 1] % len(pchars)]
+                password.append(pchar)
+
+        return ''.join(password)
+
+class AlgorithmV1(AlgorithmV0):
+    def site_password(seed, template_type):
+        templates = TEMPLATE_TYPES[template_type]
+        template = templates[seed[0] % len(templates)]
+
+        password = []
+        for i, tchar in enumerate(template):
+            if tchar == ' ':
+                password.append(tchar)
+            else:
+                pchars = CHARACTER_GROUPS[tchar]
+                pchar = pchars[seed[i + 1] % len(pchars)]
+                password.append(pchar)
+
+        return ''.join(password)
+
+class AlgorithmV2(AlgorithmV1):
+    def site_seed(key, site, counter):
+        msg = utf8(PACKAGE_NAME) + \
+              uint_32(len(utf8(site))) + \
+              utf8(site) + \
+              uint_32(counter)
+        seed = HMAC.new(key, msg, SHA256).digest()
+        return seed
+
+class AlgorithmV3(AlgorithmV2):
+    def master_key(master_password, salt_string):
+        salt = utf8(PACKAGE_NAME) + \
+               uint_32(len(utf8(salt_string))) + \
+               utf8(salt_string)
+        key = scrypt.hash(utf8(master_password), salt, 32768, 8, 2, 64)
+        return key
 
 # the following constants are taken directly from
 # https://github.com/Lyndir/MasterPassword/blob/master/core/c/mpw-types.c

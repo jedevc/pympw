@@ -35,7 +35,6 @@ For more usage of Master Password, see [here](http://masterpasswordapp.com/).
 
 ## Goals
 
-- Other algorithm versions
 - Master key caching
 - Storage of site data
 
