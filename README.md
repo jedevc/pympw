@@ -31,7 +31,11 @@ then enter your master password when prompted. Here are a few examples:
 	Master Password:
 	Site Password: "n5:@PVWg&g9ACZz8fdCh"
 
-For more usage of Master Password, see [here](http://masterpasswordapp.com/).
+pympw comes with its own built in help. To access it, simply execute the following:
+
+	$ mpw --help
+
+For more information on Master Password, see [here](http://masterpasswordapp.com/).
 
 ## Goals
 
