@@ -1,6 +1,6 @@
 # =============================================================================
 #
-#  Copyright (c) 2011-2017, Justin Chadwell (@jedevc).
+#  Copyright (c) 2011-2017, Justin Chadwell.
 # 
 #  This program is free software: you can redistribute it and/or modify it
 #  under the terms of the GNU General Public License as published by the Free
@@ -16,12 +16,6 @@
 #  Alternatively, see <http://www.gnu.org/licenses/>.
 # 
 # =============================================================================
-# 
-#  This is a python implementation of the Master Password algorithm, found at
-#  <https://github.com/Lyndir/MasterPassword>.
-#
-#  All credit for the algorithm goes to Maarten Billemont.
-#
 
 import argparse
 import subprocess
@@ -31,25 +25,24 @@ from . import algorithm
 from .algorithm import Algorithm
 
 def main():
-    parser = argparse.ArgumentParser(description = 'Generate a password using the MasterPassword algorithm.')
+    parser = argparse.ArgumentParser(description='Generate a password using the MasterPassword algorithm.')
 
     # input options
-    parser.add_argument('name', help = 'Your full name')
-    parser.add_argument('site', help = 'The site name')
-    parser.add_argument('-t', '--template', default = 'long',
-            choices = algorithm.TEMPLATE_TYPES.keys(),
-            help = 'The password type template')
-    parser.add_argument('-c', '--counter', type = int, default = 1,
-            help = "The site's password counter")
-    parser.add_argument('-v', '--version', type = int, default = 3,
-            choices = [0, 1, 2, 3],
-            help = 'MasterPassword algorithm version')
+    parser.add_argument('name', help='Your full name')
+    parser.add_argument('site', help='The site name')
+    parser.add_argument('-t', '--template', default='long',
+            choices=algorithm.TEMPLATE_TYPES.keys(),
+            help='The password type template')
+    parser.add_argument('-c', '--counter', type=int, default=1,
+            help="The site's password counter")
+    parser.add_argument('-v', '--version', type=int, default=3,
+            choices=[0, 1, 2, 3], help='MasterPassword algorithm version')
 
     # output options
-    parser.add_argument('-p', '--print', action = 'store_true',
-            help = "Print the password to stdout")
-    parser.add_argument('-x', '--cut', action = 'store_true',
-            help = 'Paste the password to the system clipboard')
+    parser.add_argument('-p', '--print', action='store_true',
+            help="Print the password to stdout")
+    parser.add_argument('-x', '--cut', action='store_true',
+            help='Paste the password to the system clipboard')
 
     args = parser.parse_args()
 
@@ -64,7 +57,7 @@ def main():
 
     # output site password
     if args.print:
-        print('Site Password: "{}"'.format(site_password))
+        print(f'Site Password: "{site_password}"')
     if args.cut:
         clipboard_copy(site_password)
 
@@ -76,7 +69,7 @@ def clipboard_copy(data):
         data: The data to copy to the clipboard.
     '''
 
-    proc = subprocess.run(['xsel', '-bi'], input = data.encode('utf8'))
+    proc = subprocess.run(['xsel', '-bi'], input=data.encode('utf8'))
     proc.check_returncode()
 
 if __name__ == "__main__":
