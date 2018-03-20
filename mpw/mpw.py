@@ -57,7 +57,7 @@ def main():
 
     # output site password
     if args.print:
-        print(f'Site Password: "{site_password}"')
+        print('Site Password: "{}"'.format(site_password))
     if args.cut:
         clipboard_copy(site_password)
 
