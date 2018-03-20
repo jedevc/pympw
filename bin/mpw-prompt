@@ -18,13 +18,7 @@ fi
 echo -n | xsel -bi
 
 xterm -T 'MasterPassword' -e '
-read -p "Name: " name
-read -p "Site: " site
-read -p "Template (long): " template
-template=${template:-long}
-read -p "Counter (1): " counter
-counter=${counter:-1}
-mpw $name $site -t $template -c $counter -x
+mpw prompt -x
 if [ $? -ne 0 ]; then read; fi
 '
 

@@ -18,59 +18,48 @@
 # =============================================================================
 
 import argparse
-import subprocess
-from getpass import getpass
 
 from . import algorithm
-from .algorithm import Algorithm
+from . import cmd
 
 def main():
     parser = argparse.ArgumentParser(description='Generate a password using the MasterPassword algorithm.')
+    subparsers = parser.add_subparsers()
 
-    # input options
-    parser.add_argument('name', help='Your full name')
-    parser.add_argument('site', help='The site name')
-    parser.add_argument('-t', '--template', default='long',
+    generate = subparsers.add_parser('generate', help='Generate a password')
+    generate.set_defaults(func=cmd.generate)
+    generate.add_argument('name', help='Your full name')
+    generate.add_argument('site', help='The site name')
+    generate.add_argument('-t', '--template', default='long',
             choices=algorithm.TEMPLATE_TYPES.keys(),
             help='The password type template')
-    parser.add_argument('-c', '--counter', type=int, default=1,
+    generate.add_argument('-c', '--counter', type=int, default=1,
             help="The site's password counter")
-    parser.add_argument('-v', '--version', type=int, default=3,
+    generate.add_argument('-v', '--version', type=int, default=3,
             choices=[0, 1, 2, 3], help='MasterPassword algorithm version')
-
-    # output options
-    parser.add_argument('-p', '--print', action='store_true',
+    generate.add_argument('-p', '--print', action='store_true',
             help="Print the password to stdout")
-    parser.add_argument('-x', '--cut', action='store_true',
+    generate.add_argument('-x', '--cut', action='store_true',
+            help='Paste the password to the system clipboard')
+
+    prompt = subparsers.add_parser('prompt')
+    prompt.set_defaults(func=cmd.prompt)
+    prompt.add_argument('-n', '--name', help='Your full name')
+    prompt.add_argument('-s', '--site', help='The site name')
+    prompt.add_argument('-t', '--template',
+            choices=algorithm.TEMPLATE_TYPES.keys(),
+            help='The password type template')
+    prompt.add_argument('-c', '--counter', type=int,
+            help="The site's password counter")
+    prompt.add_argument('-v', '--version', type=int, default=3,
+            choices=[0, 1, 2, 3], help='MasterPassword algorithm version')
+    prompt.add_argument('-p', '--print', action='store_true',
+            help="Print the password to stdout")
+    prompt.add_argument('-x', '--cut', action='store_true',
             help='Paste the password to the system clipboard')
 
     args = parser.parse_args()
-
-    # get master password
-    password = getpass('Master Password: ')
-
-    # generate site password
-    gen = Algorithm(args.version)
-    key = gen.master_key(password, args.name)
-    site_seed = gen.site_seed(key, args.site, args.counter)
-    site_password = gen.site_password(site_seed, args.template)
-
-    # output site password
-    if args.print:
-        print('Site Password: "{}"'.format(site_password))
-    if args.cut:
-        clipboard_copy(site_password)
-
-def clipboard_copy(data):
-    '''
-    Utility function to copy a string to the system clipboard.
-
-    Args:
-        data: The data to copy to the clipboard.
-    '''
-
-    proc = subprocess.run(['xsel', '-bi'], input=data.encode('utf8'))
-    proc.check_returncode()
+    args.func(args)
 
 if __name__ == "__main__":
     main()
