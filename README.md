@@ -1,5 +1,8 @@
 # pympw
 
+**WARNING**: This branch is in development and is unstable. Do not use it for
+anything important.
+
 pympw is a master password generation tool based on
 [Master Password](https://github.com/Lyndir/MasterPassword). I loved the idea,
 and I wanted to try writing my own (unofficial) version of it.
