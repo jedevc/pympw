@@ -23,10 +23,11 @@ from . import algorithm
 from . import cmd
 
 def main():
-    parser = argparse.ArgumentParser(description='Generate a password using the MasterPassword algorithm.')
-    subparsers = parser.add_subparsers()
+    parser = argparse.ArgumentParser(description='A password manager using the MasterPassword algorithm.')
+    subparsers = parser.add_subparsers(title='subcommands')
 
-    generate = subparsers.add_parser('generate', help='Generate a password')
+    generate = subparsers.add_parser('generate', aliases=['gen'],
+            help='Generate a password')
     generate.set_defaults(func=cmd.generate)
     generate.add_argument('name', help='Your full name')
     generate.add_argument('site', help='The site name')
@@ -42,7 +43,8 @@ def main():
     generate.add_argument('-x', '--cut', action='store_true',
             help='Paste the password to the system clipboard')
 
-    prompt = subparsers.add_parser('prompt')
+    prompt = subparsers.add_parser('prompt',
+            help='Generate a password with the help of a prompt')
     prompt.set_defaults(func=cmd.prompt)
     prompt.add_argument('-n', '--name', help='Your full name')
     prompt.add_argument('-s', '--site', help='The site name')
@@ -59,7 +61,10 @@ def main():
             help='Paste the password to the system clipboard')
 
     args = parser.parse_args()
-    args.func(args)
+    if hasattr(args, 'func'):
+        args.func(args)
+    else:
+        parser.print_help()
 
 if __name__ == "__main__":
     main()
