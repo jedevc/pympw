@@ -23,9 +23,11 @@ from . import algorithm
 from . import cmd
 
 def main():
+    # mpw
     parser = argparse.ArgumentParser(description='A password manager using the MasterPassword algorithm.')
     subparsers = parser.add_subparsers(title='subcommands')
 
+    # mpw generate
     generate = subparsers.add_parser('generate', aliases=['gen'],
             help='Generate a password')
     generate.set_defaults(func=cmd.generate)
@@ -43,6 +45,7 @@ def main():
     generate.add_argument('-x', '--cut', action='store_true',
             help='Paste the password to the system clipboard')
 
+    # mpw prompt
     prompt = subparsers.add_parser('prompt',
             help='Generate a password with the help of a prompt')
     prompt.set_defaults(func=cmd.prompt)
