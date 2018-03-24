@@ -53,7 +53,7 @@ def main():
             help='The password type template')
     prompt.add_argument('-c', '--counter', type=int,
             help="The site's password counter")
-    prompt.add_argument('-v', '--version', type=int, default=3,
+    prompt.add_argument('-v', '--version', type=int,
             choices=[0, 1, 2, 3], help='MasterPassword algorithm version')
     prompt.add_argument('-p', '--print', action='store_true',
             help="Print the password to stdout")

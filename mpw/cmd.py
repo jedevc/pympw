@@ -50,7 +50,7 @@ def prompt(args):
         args.counter = int(input('Counter (1): ') or 1)
     if not args.version:
         args.version = int(input('Version (3): ') or 3)
-        if 0 <= args.version <= 3:
+        if not 0 <= args.version <= 3:
             raise ValueError('invalid version number')
 
     password = getpass('Master Password: ')
