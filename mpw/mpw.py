@@ -41,7 +41,7 @@ def main():
     generate.add_argument('-v', '--version', type=int, default=3,
             choices=[0, 1, 2, 3], help='MasterPassword algorithm version')
     generate.add_argument('-p', '--print', action='store_true',
-            help="Print the password to stdout")
+            help='Print the password to stdout')
     generate.add_argument('-x', '--cut', action='store_true',
             help='Paste the password to the system clipboard')
 
@@ -59,7 +59,7 @@ def main():
     prompt.add_argument('-v', '--version', type=int,
             choices=[0, 1, 2, 3], help='MasterPassword algorithm version')
     prompt.add_argument('-p', '--print', action='store_true',
-            help="Print the password to stdout")
+            help='Print the password to stdout')
     prompt.add_argument('-x', '--cut', action='store_true',
             help='Paste the password to the system clipboard')
 
