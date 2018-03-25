@@ -19,6 +19,7 @@
 
 import subprocess
 from getpass import getpass
+from shutil import get_terminal_size
 
 from . import algorithm
 
@@ -36,34 +37,39 @@ def generate(args):
         clipboard_copy(site_password)
 
 def prompt(args):
-    if not args.name:
-        args.name = input('Name: ')
-        if not args.name: raise ValueError('empty string')
-    if not args.site:
-        args.site = input('Site: ')
-        if not args.site: raise ValueError('empty string')
-    if not args.template:
-        args.template = input('Template (long): ') or 'long'
-        if args.template not in algorithm.TEMPLATE_TYPES.keys(): 
-            raise KeyError('invalid template type')
-    if not args.counter:
-        args.counter = int(input('Counter (1): ') or 1)
-    if not args.version:
-        args.version = int(input('Version (3): ') or 3)
-        if not 0 <= args.version <= 3:
-            raise ValueError('invalid version number')
+    name = args.name or input('Name: ')
+    if not name: raise ValueError('empty string')
 
     password = getpass('Master Password: ')
 
-    gen = algorithm.Algorithm(args.version)
-    key = gen.master_key(password, args.name)
-    site_seed = gen.site_seed(key, args.site, args.counter)
-    site_password = gen.site_password(site_seed, args.template)
+    version = int(args.version or input('Version (3): ') or 3)
+    if not 0 <= version <= 3:
+        raise ValueError('invalid version number')
 
-    if args.print:
-        print('Site Password: "{}"'.format(site_password))
-    if args.cut:
-        clipboard_copy(site_password)
+    while True:  # do while loop
+        cols = get_terminal_size()[0]
+        print('-' * cols)
+
+        site = args.site or input('Site: ')
+        if not site: raise ValueError('empty string')
+
+        template = args.template or input('Template (long): ') or 'long'
+        if template not in algorithm.TEMPLATE_TYPES.keys():
+            raise KeyError('invalid template type')
+
+        counter = int(args.counter or input('Counter (1): ') or 1)
+
+        gen = algorithm.Algorithm(version)
+        key = gen.master_key(password, name)
+        site_seed = gen.site_seed(key, site, counter)
+        site_password = gen.site_password(site_seed, template)
+
+        if args.print:
+            print('Site Password: "{}"'.format(site_password))
+        if args.cut:
+            clipboard_copy(site_password)
+
+        if not args.loop: break
 
 def clipboard_copy(data):
     '''

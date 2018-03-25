@@ -17,6 +17,7 @@
 #
 # =============================================================================
 
+import sys
 import argparse
 
 from . import algorithm
@@ -62,10 +63,18 @@ def main():
             help='Print the password to stdout')
     prompt.add_argument('-x', '--cut', action='store_true',
             help='Paste the password to the system clipboard')
+    prompt.add_argument('-l', '--loop', action='store_true',
+            help='Read site details in a loop')
 
     args = parser.parse_args()
     if hasattr(args, 'func'):
-        args.func(args)
+        try:
+            args.func(args)
+        except EOFError:
+            print()
+        except (ValueError, KeyError) as e:
+            print(e)
+            sys.exit(1)
     else:
         parser.print_help()
 
