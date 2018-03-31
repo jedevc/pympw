@@ -20,29 +20,42 @@ Done!
 ## Usage
 
 Running pympw is simple. Provide the commandline arguments that you need, and
-then enter your master password when prompted. Here are a few examples:
+then enter your master password when prompted. Here are a few examples using
+the password `hunter2`.
 
-	$ mpw -p 'James Smith' github.com  # generate a password
+	$ mpw gen 'James Smith' github.com -p # generate a password
 	Master Password:
-	Site Password: "XamiJeqaDiku5["
+	Site Password: "PiloCiwm9.Qupa"
 
-	$ mpw -p 'James Smith' github.com -c 3  # generate a password with an explicit site counter
+	$ mpw gen 'James Smith' github.com -p -c3  # generate a password with an explicit site counter
 	Master Password:
-	Site Password: "CeyhCosaYoru7@"
+	Site Password: "YipyMibf7'Yiwo"
 
-	$ mpw -p 'James Smith' github.com -t maximum  # generate a maximum security password
+	$ mpw gen 'James Smith' github.com -p -t maximum  # generate a maximum security password
 	Master Password:
-	Site Password: "n5:@PVWg&g9ACZz8fdCh"
+	Site Password: "cKnotHyu3)h04qiPZh1%"
 
-pympw comes with its own built in help. To access it, simply execute the following:
+If that's too much work for you, pympw can also create a prompt for you.
+
+	$ mpw prompt
+	Name: James Smith
+	Version (3):
+	Master Password:
+	----------------------------------------
+	Site: github.com
+	Template (long):
+	Counter (1):
+	Site Password: "PiloCiwm9.Qupa"
+
+	$ mpw dprompt
+	--> presents a dialog interface
+
+pympw comes with its own built in help. To access it, simply execute the
+following:
 
 	$ mpw --help
 
 For more information on Master Password, see [here](http://masterpasswordapp.com/).
-
-## Goals
-
-- Storage of site data
 
 ## Development
 
@@ -62,3 +75,7 @@ to manage multiple projects that way.
 	$ pip install -r requirements.txt
 
 To run pympw, simply run ```python main.py``` with appropriate arguments.
+
+## Goals
+
+- Storage of site data
