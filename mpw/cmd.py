@@ -40,38 +40,46 @@ def generate(args):
 
 def prompt(args):
     # details prompt
-    name = args.name or input('Name: ')
-    if not name: raise ValueError('empty string')
+    name = args.name
+    while not name or len(name) == 0:
+        name = input('Name: ')
 
-    version = int(args.version or input('Version (3): ') or 3)
-    if not 0 <= version <= 3:
-        raise ValueError('invalid version number')
+    version = args.version
+    while not version or not 0 <= version <= 3:
+        try:
+            version = int(input('Version (3): ') or 3)
+        except ValueError:
+            continue
 
     # password prompt
     while True:
         password = getpass('Master Password: ')
-        if len(password) == 0:
-            raise ValueError('zero length password')
-        else:
+        if len(password) != 0:
             break
 
     # setup master password
     gen = algorithm.Algorithm(version)
     key = gen.master_key(password, name)
 
-    while True:  # do while loop
+    while True:
         cols = get_terminal_size()[0]
         print('-' * cols)
 
         # site prompt
-        site = args.site or input('Site: ')
-        if not site: raise ValueError('empty string')
+        site = args.site
+        while not site or len(site) == 0:
+            site = input('Site: ')
 
-        template = args.template or input('Template (long): ') or 'long'
-        if template not in algorithm.TEMPLATE_TYPES.keys():
-            raise ValueError('invalid template type')
+        template = args.template
+        while template not in algorithm.TEMPLATE_TYPES.keys():
+            template = input('Template (long): ') or 'long'
 
-        counter = int(args.counter or input('Counter (1): ') or 1)
+        counter = args.counter
+        while not counter:
+            try:
+                counter = int(input('Counter (1): ') or 1)
+            except ValueError:
+                continue
 
         site_seed = gen.site_seed(key, site, counter)
         site_password = gen.site_password(site_seed, template)
@@ -129,7 +137,7 @@ def dialog_prompt(args):
     gen = algorithm.Algorithm(version)
     key = gen.master_key(password, name)
 
-    while True:  # do while loop
+    while True:
         # site dialog
         site = args.site
         template = args.template
