@@ -42,7 +42,6 @@ For more information on Master Password, see [here](http://masterpasswordapp.com
 
 ## Goals
 
-- Master key caching
 - Storage of site data
 
 ## Development
