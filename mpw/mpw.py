@@ -92,9 +92,6 @@ def main():
             args.func(args)
         except EOFError:  # keyboard exit code (Ctrl+d)
             print()
-        except ValueError as e:  # internal input error
-            print(e)
-            sys.exit(1)
     else:
         parser.print_help()
 
