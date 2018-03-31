@@ -55,7 +55,7 @@ def prompt(args):
 
         template = args.template or input('Template (long): ') or 'long'
         if template not in algorithm.TEMPLATE_TYPES.keys():
-            raise KeyError('invalid template type')
+            raise ValueError('invalid template type')
 
         counter = int(args.counter or input('Counter (1): ') or 1)
 

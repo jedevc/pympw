@@ -70,9 +70,9 @@ def main():
     if hasattr(args, 'func'):
         try:
             args.func(args)
-        except EOFError:
+        except EOFError:  # keyboard exit code (Ctrl+d)
             print()
-        except (ValueError, KeyError) as e:
+        except ValueError as e:  # internal input error
             print(e)
             sys.exit(1)
     else:
