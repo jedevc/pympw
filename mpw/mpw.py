@@ -33,14 +33,14 @@ def main():
             help='Generate a password')
     generate.set_defaults(func=cmd.generate)
     generate.add_argument('name', help='Your full name')
+    generate.add_argument('-v', '--version', type=int, default=3,
+            choices=[0, 1, 2, 3], help='MasterPassword algorithm version')
     generate.add_argument('site', help='The site name')
     generate.add_argument('-t', '--template', default='long',
             choices=algorithm.TEMPLATE_TYPES.keys(),
             help='The password type template')
     generate.add_argument('-c', '--counter', type=int, default=1,
             help="The site's password counter")
-    generate.add_argument('-v', '--version', type=int, default=3,
-            choices=[0, 1, 2, 3], help='MasterPassword algorithm version')
     generate.add_argument('-p', '--print', action='store_true',
             help='Print the password to stdout')
     generate.add_argument('-x', '--cut', action='store_true',
@@ -51,19 +51,39 @@ def main():
             help='Generate a password with the help of a prompt')
     prompt.set_defaults(func=cmd.prompt)
     prompt.add_argument('-n', '--name', help='Your full name')
+    prompt.add_argument('-v', '--version', type=int,
+            choices=[0, 1, 2, 3], help='MasterPassword algorithm version')
     prompt.add_argument('-s', '--site', help='The site name')
     prompt.add_argument('-t', '--template',
             choices=algorithm.TEMPLATE_TYPES.keys(),
             help='The password type template')
     prompt.add_argument('-c', '--counter', type=int,
             help="The site's password counter")
-    prompt.add_argument('-v', '--version', type=int,
-            choices=[0, 1, 2, 3], help='MasterPassword algorithm version')
     prompt.add_argument('-p', '--print', action='store_true',
             help='Print the password to stdout')
     prompt.add_argument('-x', '--cut', action='store_true',
             help='Paste the password to the system clipboard')
     prompt.add_argument('-l', '--loop', action='store_true',
+            help='Read site details in a loop')
+
+    # mpw dialog-prompt
+    dialog = subparsers.add_parser('dialog-prompt', aliases=['dialog', 'dprompt'],
+            help='Generate a password with the help of a dialog')
+    dialog.set_defaults(func=cmd.dialog_prompt)
+    dialog.add_argument('-n', '--name', default='', help='Your full name')
+    dialog.add_argument('-v', '--version', type=int, default=3,
+            choices=[0, 1, 2, 3], help='MasterPassword algorithm version')
+    dialog.add_argument('-s', '--site', default='', help='The site name')
+    dialog.add_argument('-t', '--template', default='long',
+            choices=algorithm.TEMPLATE_TYPES.keys(),
+            help='The password type template')
+    dialog.add_argument('-c', '--counter', type=int, default=1,
+            help="The site's password counter")
+    dialog.add_argument('-p', '--print', action='store_true',
+            help='Print the password to stdout')
+    dialog.add_argument('-x', '--cut', action='store_true',
+            help='Paste the password to the system clipboard')
+    dialog.add_argument('-l', '--loop', action='store_true',
             help='Read site details in a loop')
 
     args = parser.parse_args()
