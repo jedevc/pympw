@@ -36,6 +36,7 @@ def generate(args):
     if args.print:
         print('Site Password: "{}"'.format(site_password))
     if args.cut:
+        print('Copied to clipboard.')
         clipboard_copy(site_password)
 
 def prompt(args):
@@ -88,6 +89,7 @@ def prompt(args):
         if args.print:
             print('Site Password: "{}"'.format(site_password))
         if args.cut:
+            print('Copied to clipboard.')
             clipboard_copy(site_password)
 
         if not args.loop: break
@@ -171,10 +173,13 @@ def dialog_prompt(args):
                 site_password = gen.site_password(site_seed, template)
 
                 # output
+                msg = ''
                 if args.print:
-                    d.msgbox('Site Password: "{}"'.format(site_password))
+                    msg += 'Site Password: "{}"\n'.format(site_password)
                 if args.cut:
+                    msg += 'Copied to clipboard.\n'
                     clipboard_copy(site_password)
+                if msg: d.msgbox(msg)
 
                 break
 
