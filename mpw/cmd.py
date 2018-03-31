@@ -39,19 +39,31 @@ def generate(args):
         clipboard_copy(site_password)
 
 def prompt(args):
+    # details prompt
     name = args.name or input('Name: ')
     if not name: raise ValueError('empty string')
-
-    password = getpass('Master Password: ')
 
     version = int(args.version or input('Version (3): ') or 3)
     if not 0 <= version <= 3:
         raise ValueError('invalid version number')
 
+    # password prompt
+    while True:
+        password = getpass('Master Password: ')
+        if len(password) == 0:
+            raise ValueError('zero length password')
+        else:
+            break
+
+    # setup master password
+    gen = algorithm.Algorithm(version)
+    key = gen.master_key(password, name)
+
     while True:  # do while loop
         cols = get_terminal_size()[0]
         print('-' * cols)
 
+        # site prompt
         site = args.site or input('Site: ')
         if not site: raise ValueError('empty string')
 
@@ -61,11 +73,10 @@ def prompt(args):
 
         counter = int(args.counter or input('Counter (1): ') or 1)
 
-        gen = algorithm.Algorithm(version)
-        key = gen.master_key(password, name)
         site_seed = gen.site_seed(key, site, counter)
         site_password = gen.site_password(site_seed, template)
 
+        # output
         if args.print:
             print('Site Password: "{}"'.format(site_password))
         if args.cut:
@@ -114,6 +125,10 @@ def dialog_prompt(args):
         else:
             break
 
+    # setup master password
+    gen = algorithm.Algorithm(version)
+    key = gen.master_key(password, name)
+
     while True:  # do while loop
         # site dialog
         site = args.site
@@ -144,11 +159,10 @@ def dialog_prompt(args):
                 d.msgbox('Must input a counter value.')
                 counter = args.counter
             else:
-                gen = algorithm.Algorithm(version)
-                key = gen.master_key(password, name)
                 site_seed = gen.site_seed(key, site, counter)
                 site_password = gen.site_password(site_seed, template)
 
+                # output
                 if args.print:
                     d.msgbox('Site Password: "{}"'.format(site_password))
                 if args.cut:
