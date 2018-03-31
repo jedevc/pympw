@@ -18,10 +18,6 @@ setup(
     install_requires=['pycrypto', 'scrypt'],
     python_requires='>=3',
 
-    scripts=[
-        'bin/mpw-prompt'
-    ],
-    
     entry_points={
         'console_scripts': [
             'mpw=mpw:main'
