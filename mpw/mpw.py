@@ -25,7 +25,7 @@ from . import cmd
 
 def main():
     # mpw
-    parser = argparse.ArgumentParser(description='A password manager using the MasterPassword algorithm.')
+    parser = argparse.ArgumentParser(description='Manage your passwords using the MasterPassword algorithm')
     subparsers = parser.add_subparsers(title='subcommands')
 
     # mpw generate
@@ -43,8 +43,8 @@ def main():
             help="The site's password counter")
     generate.add_argument('-p', '--print', action='store_true',
             help='Print the password to stdout')
-    generate.add_argument('-x', '--cut', action='store_true',
-            help='Paste the password to the system clipboard')
+    generate.add_argument('-x', '--copy', action='store_true',
+            help='Copy the password to the system clipboard')
 
     # mpw prompt
     prompt = subparsers.add_parser('prompt',
@@ -61,8 +61,8 @@ def main():
             help="The site's password counter")
     prompt.add_argument('-p', '--print', action='store_true',
             help='Print the password to stdout')
-    prompt.add_argument('-x', '--cut', action='store_true',
-            help='Paste the password to the system clipboard')
+    prompt.add_argument('-x', '--copy', action='store_true',
+            help='Copy the password to the system clipboard')
     prompt.add_argument('-l', '--loop', action='store_true',
             help='Read site details in a loop')
 
@@ -81,8 +81,8 @@ def main():
             help="The site's password counter")
     dialog.add_argument('-p', '--print', action='store_true',
             help='Print the password to stdout')
-    dialog.add_argument('-x', '--cut', action='store_true',
-            help='Paste the password to the system clipboard')
+    dialog.add_argument('-x', '--copy', action='store_true',
+            help='Copy the password to the system clipboard')
     dialog.add_argument('-l', '--loop', action='store_true',
             help='Read site details in a loop')
 

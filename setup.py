@@ -6,7 +6,7 @@ with open('README.md') as f:
 setup(
     name='pympw',
     version='0.1',
-    description='A python implementation of the Master Password algorithm.',
+    description='Manage your passwords using the MasterPassword algorithm',
     long_description=long_description,
     long_description_content_type='text/markdown',
 
