@@ -15,7 +15,7 @@ setup(
     license='GPL3',
 
     packages=['mpw'],
-    install_requires=['pycrypto', 'scrypt'],
+    install_requires=['pycrypto', 'scrypt', 'pythondialog'],
     python_requires='>=3',
 
     entry_points={
