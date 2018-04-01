@@ -1,1 +1,1 @@
-from .mpw import main
+__all__ = ['mpw', 'algorithm']

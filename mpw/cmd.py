@@ -39,6 +39,8 @@ def generate(args):
         print('Copied to clipboard.')
         clipboard_copy(site_password)
 
+    return site_password
+
 def prompt(args):
     # details prompt
     name = args.name

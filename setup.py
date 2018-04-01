@@ -20,7 +20,7 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'mpw=mpw:main'
+            'mpw=mpw.mpw:main'
         ]
     }
 )

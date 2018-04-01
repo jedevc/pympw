@@ -23,7 +23,7 @@ import argparse
 from . import algorithm
 from . import cmd
 
-def main():
+def main(*arglist):
     # mpw
     parser = argparse.ArgumentParser(description='Manage your passwords using the MasterPassword algorithm')
     subparsers = parser.add_subparsers(title='subcommands')
@@ -86,14 +86,15 @@ def main():
     dialog.add_argument('-l', '--loop', action='store_true',
             help='Read site details in a loop')
 
-    args = parser.parse_args()
+    if arglist:
+        args = parser.parse_args(arglist)
+    else:
+        args = parser.parse_args()
+
     if hasattr(args, 'func'):
         try:
-            args.func(args)
+            return args.func(args)
         except EOFError:  # keyboard exit code (Ctrl+d)
             print()
     else:
         parser.print_help()
-
-if __name__ == "__main__":
-    main()
