@@ -35,7 +35,7 @@ def generate(args):
 
     if args.print:
         print('Site Password: "{}"'.format(site_password))
-    if args.cut:
+    if args.copy:
         print('Copied to clipboard.')
         clipboard_copy(site_password)
 
@@ -88,7 +88,7 @@ def prompt(args):
         # output
         if args.print:
             print('Site Password: "{}"'.format(site_password))
-        if args.cut:
+        if args.copy:
             print('Copied to clipboard.')
             clipboard_copy(site_password)
 
@@ -176,7 +176,7 @@ def dialog_prompt(args):
                 msg = ''
                 if args.print:
                     msg += 'Site Password: "{}"\n'.format(site_password)
-                if args.cut:
+                if args.copy:
                     msg += 'Copied to clipboard.\n'
                     clipboard_copy(site_password)
                 if msg: d.msgbox(msg)
