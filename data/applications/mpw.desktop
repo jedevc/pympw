@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Master Password
+GenericName=Password Manager
+Version=0.1
+Comment=Manage your passwords using the MasterPassword algorithm
+TryExec=mpw
+Exec=/usr/bin/xterm -T 'MasterPassword' -e 'mpw dialog -px -l'
+Terminal=false
