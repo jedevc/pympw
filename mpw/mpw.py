@@ -41,9 +41,9 @@ def main(*arglist):
             help='The password type template')
     generate.add_argument('-c', '--counter', type=int, default=1,
             help="The site's password counter")
-    generate.add_argument('-p', '--print', action='store_true',
+    generate.add_argument('-p', '--stdout', '--print', action='store_true',
             help='Print the password to stdout')
-    generate.add_argument('-x', '--copy', action='store_true',
+    generate.add_argument('-x', '--clipboard', '--copy', action='store_true',
             help='Copy the password to the system clipboard')
 
     # mpw prompt
@@ -59,9 +59,9 @@ def main(*arglist):
             help='The password type template')
     prompt.add_argument('-c', '--counter', type=int,
             help="The site's password counter")
-    prompt.add_argument('-p', '--print', action='store_true',
+    prompt.add_argument('-p', '--stdout', action='store_true',
             help='Print the password to stdout')
-    prompt.add_argument('-x', '--copy', action='store_true',
+    prompt.add_argument('-x', '--clipboard', action='store_true',
             help='Copy the password to the system clipboard')
     prompt.add_argument('-l', '--loop', action='store_true',
             help='Read site details in a loop')
@@ -69,7 +69,7 @@ def main(*arglist):
     # mpw dialog-prompt
     dialog = subparsers.add_parser('dialog-prompt', aliases=['dialog', 'dprompt'],
             help='Generate a password with the help of a dialog')
-    dialog.set_defaults(func=cmd.dialog_prompt)
+    dialog.set_defaults(func=cmd.dprompt)
     dialog.add_argument('-n', '--name', default='', help='Your full name')
     dialog.add_argument('-v', '--version', type=int, default=3,
             choices=[0, 1, 2, 3], help='MasterPassword algorithm version')
@@ -79,9 +79,9 @@ def main(*arglist):
             help='The password type template')
     dialog.add_argument('-c', '--counter', type=int, default=1,
             help="The site's password counter")
-    dialog.add_argument('-p', '--print', action='store_true',
+    dialog.add_argument('-p', '--stdout', action='store_true',
             help='Print the password to stdout')
-    dialog.add_argument('-x', '--copy', action='store_true',
+    dialog.add_argument('-x', '--clipboard', action='store_true',
             help='Copy the password to the system clipboard')
     dialog.add_argument('-l', '--loop', action='store_true',
             help='Read site details in a loop')
@@ -93,7 +93,9 @@ def main(*arglist):
 
     if hasattr(args, 'func'):
         try:
-            return args.func(vars(args))
+            args = vars(args)
+            func = args.pop('func')
+            return func(**args)
         except EOFError:  # keyboard exit code (Ctrl+d)
             print()
     else:

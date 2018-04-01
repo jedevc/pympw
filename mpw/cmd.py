@@ -25,29 +25,27 @@ import dialog
 
 from . import algorithm
 
-def generate(args):
+def generate(name, version, site, template, counter, stdout, clipboard):
     password = getpass('Master Password: ')
 
-    gen = algorithm.Algorithm(args['version'])
-    key = gen.master_key(password, args['name'])
-    site_seed = gen.site_seed(key, args['site'], args['counter'])
-    site_password = gen.site_password(site_seed, args['template'])
+    gen = algorithm.Algorithm(version)
+    key = gen.master_key(password, name)
+    site_seed = gen.site_seed(key, site, counter)
+    site_password = gen.site_password(site_seed, template)
 
-    if args['print']:
+    if stdout:
         print('Site Password: "{}"'.format(site_password))
-    if args['copy']:
+    if clipboard:
         print('Copied to clipboard.')
         clipboard_copy(site_password)
 
     return site_password
 
-def prompt(args):
+def prompt(name, version, site, template, counter, stdout, clipboard, loop):
     # details prompt
-    name = args['name']
     while not name or len(name) == 0:
         name = input('Name: ')
 
-    version = args['version']
     while not version or not 0 <= version <= 3:
         try:
             version = int(input('Version (3): ') or 3)
@@ -69,15 +67,12 @@ def prompt(args):
         print('-' * cols)
 
         # site prompt
-        site = args['site']
         while not site or len(site) == 0:
             site = input('Site: ')
 
-        template = args['template']
         while template not in algorithm.TEMPLATE_TYPES.keys():
             template = input('Template (long): ') or 'long'
 
-        counter = args['counter']
         while not counter:
             try:
                 counter = int(input('Counter (1): ') or 1)
@@ -88,22 +83,22 @@ def prompt(args):
         site_password = gen.site_password(site_seed, template)
 
         # output
-        if args['print']:
+        if stdout:
             print('Site Password: "{}"'.format(site_password))
-        if args['copy']:
+        if clipboard:
             print('Copied to clipboard.')
             clipboard_copy(site_password)
 
-        if not args['loop']: break
+        if not loop: break
 
-def dialog_prompt(args):
+def dprompt(name, version, site, template, counter, stdout, clipboard, loop):
     d = dialog.Dialog()
 
     offset = 10
 
     # details dialog
-    name = args['name']
-    version = args['version']
+    old_name = name
+    old_version = version
     while True:
         status, elements = d.form('Enter your login details.', [
             ('Name', 1, 0, name, 1, offset, 128, 0),
@@ -119,11 +114,16 @@ def dialog_prompt(args):
             version = None
 
         # error messages
+        errors = []
         if len(name) == 0:
-            d.msgbox('Must input a name.')
-        elif not version or not 0 <= version <= 3:
-            d.msgbox('Must input a valid version number (0, 1, 2, 3).')
-            version = args['version']
+            errors.append('Must input a name.')
+            name = old_name
+        if not version or not 0 <= version <= 3:
+            errors.append('Must input a valid version number (0, 1, 2, 3).')
+            version = old_version
+
+        if errors:
+            d.msgbox('\n'.join(errors))
         else:
             break
 
@@ -141,11 +141,11 @@ def dialog_prompt(args):
     gen = algorithm.Algorithm(version)
     key = gen.master_key(password, name)
 
+    old_site = site
+    old_template = template
+    old_counter = counter
     while True:
         # site dialog
-        site = args['site']
-        template = args['template']
-        counter = args['counter']
         while True:
             status, elements = d.form('Enter the site details.', [
                 ('Site', 1, 0, site, 1, offset, 128, 0),
@@ -163,29 +163,36 @@ def dialog_prompt(args):
                 counter = None
 
             # error messages
+            errors = []
             if len(site) == 0:
-                d.msgbox('Must input a sitename.')
-            elif template not in algorithm.TEMPLATE_TYPES.keys():
-                d.msgbox('Must input a valid template type.')
-            elif counter is None:
-                d.msgbox('Must input a counter value.')
-                counter = args['counter']
+                errors.append('Must input a sitename.')
+                site = old_site
+            if template not in algorithm.TEMPLATE_TYPES.keys():
+                errors.append('Must input a valid template type.')
+                template = old_template
+            if counter is None:
+                errors.append('Must input a counter value.')
+                counter = old_counter
+
+            if errors:
+                d.msgbox('\n'.join(errors))
             else:
                 site_seed = gen.site_seed(key, site, counter)
                 site_password = gen.site_password(site_seed, template)
 
                 # output
-                msg = ''
-                if args['print']:
-                    msg += 'Site Password: "{}"\n'.format(site_password)
-                if args['copy']:
-                    msg += 'Copied to clipboard.\n'
+                messages = []
+                if stdout:
+                    msg = 'Site Password: "{}"'.format(site_password)
+                    messages.append(msg)
+                if clipboard:
+                    messages.append('Copied to clipboard.')
                     clipboard_copy(site_password)
-                if msg: d.msgbox(msg)
+                if messages: d.msgbox('\n'.join(messages))
 
                 break
 
-        if not args['loop']: break
+        if not loop: break
 
 def clipboard_copy(data):
     '''
