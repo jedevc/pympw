@@ -76,3 +76,4 @@ To run pympw, simply run ```python main.py``` with appropriate arguments.
 ## Goals
 
 - Storage of site data
+- Add tests
