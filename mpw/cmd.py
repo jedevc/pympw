@@ -28,14 +28,14 @@ from . import algorithm
 def generate(args):
     password = getpass('Master Password: ')
 
-    gen = algorithm.Algorithm(args.version)
-    key = gen.master_key(password, args.name)
-    site_seed = gen.site_seed(key, args.site, args.counter)
-    site_password = gen.site_password(site_seed, args.template)
+    gen = algorithm.Algorithm(args['version'])
+    key = gen.master_key(password, args['name'])
+    site_seed = gen.site_seed(key, args['site'], args['counter'])
+    site_password = gen.site_password(site_seed, args['template'])
 
-    if args.print:
+    if args['print']:
         print('Site Password: "{}"'.format(site_password))
-    if args.copy:
+    if args['copy']:
         print('Copied to clipboard.')
         clipboard_copy(site_password)
 
@@ -43,11 +43,11 @@ def generate(args):
 
 def prompt(args):
     # details prompt
-    name = args.name
+    name = args['name']
     while not name or len(name) == 0:
         name = input('Name: ')
 
-    version = args.version
+    version = args['version']
     while not version or not 0 <= version <= 3:
         try:
             version = int(input('Version (3): ') or 3)
@@ -69,15 +69,15 @@ def prompt(args):
         print('-' * cols)
 
         # site prompt
-        site = args.site
+        site = args['site']
         while not site or len(site) == 0:
             site = input('Site: ')
 
-        template = args.template
+        template = args['template']
         while template not in algorithm.TEMPLATE_TYPES.keys():
             template = input('Template (long): ') or 'long'
 
-        counter = args.counter
+        counter = args['counter']
         while not counter:
             try:
                 counter = int(input('Counter (1): ') or 1)
@@ -88,13 +88,13 @@ def prompt(args):
         site_password = gen.site_password(site_seed, template)
 
         # output
-        if args.print:
+        if args['print']:
             print('Site Password: "{}"'.format(site_password))
-        if args.copy:
+        if args['copy']:
             print('Copied to clipboard.')
             clipboard_copy(site_password)
 
-        if not args.loop: break
+        if not args['loop']: break
 
 def dialog_prompt(args):
     d = dialog.Dialog()
@@ -102,8 +102,8 @@ def dialog_prompt(args):
     offset = 10
 
     # details dialog
-    name = args.name
-    version = args.version
+    name = args['name']
+    version = args['version']
     while True:
         status, elements = d.form('Enter your login details.', [
             ('Name', 1, 0, name, 1, offset, 128, 0),
@@ -123,7 +123,7 @@ def dialog_prompt(args):
             d.msgbox('Must input a name.')
         elif not version or not 0 <= version <= 3:
             d.msgbox('Must input a valid version number (0, 1, 2, 3).')
-            version = args.version
+            version = args['version']
         else:
             break
 
@@ -143,9 +143,9 @@ def dialog_prompt(args):
 
     while True:
         # site dialog
-        site = args.site
-        template = args.template
-        counter = args.counter
+        site = args['site']
+        template = args['template']
+        counter = args['counter']
         while True:
             status, elements = d.form('Enter the site details.', [
                 ('Site', 1, 0, site, 1, offset, 128, 0),
@@ -169,23 +169,23 @@ def dialog_prompt(args):
                 d.msgbox('Must input a valid template type.')
             elif counter is None:
                 d.msgbox('Must input a counter value.')
-                counter = args.counter
+                counter = args['counter']
             else:
                 site_seed = gen.site_seed(key, site, counter)
                 site_password = gen.site_password(site_seed, template)
 
                 # output
                 msg = ''
-                if args.print:
+                if args['print']:
                     msg += 'Site Password: "{}"\n'.format(site_password)
-                if args.copy:
+                if args['copy']:
                     msg += 'Copied to clipboard.\n'
                     clipboard_copy(site_password)
                 if msg: d.msgbox(msg)
 
                 break
 
-        if not args.loop: break
+        if not args['loop']: break
 
 def clipboard_copy(data):
     '''

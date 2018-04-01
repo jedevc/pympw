@@ -93,7 +93,7 @@ def main(*arglist):
 
     if hasattr(args, 'func'):
         try:
-            return args.func(args)
+            return args.func(vars(args))
         except EOFError:  # keyboard exit code (Ctrl+d)
             print()
     else:
