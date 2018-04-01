@@ -1,1 +1,1 @@
-__all__ = ['mpw', 'algorithm']
+__all__ = ['mpw', 'cmd', 'algorithm']
