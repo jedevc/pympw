@@ -10,7 +10,7 @@ Setting up pympw is simple.
 
 	$ git clone https://github.com/jedevc/pympw.git
 	$ cd pympw
-	$ python setup.py install
+	$ pip install .
 
 Done!
 
