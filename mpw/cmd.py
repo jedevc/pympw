@@ -190,6 +190,10 @@ def dprompt(name, version, site, template, counter, stdout, clipboard, loop):
                     clipboard_copy(site_password)
                 if messages: d.msgbox('\n'.join(messages))
 
+                site = old_site
+                template = old_template
+                counter = old_counter
+
                 break
 
         if not loop: break
