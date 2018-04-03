@@ -15,12 +15,15 @@ setup(
     license='GPL3',
 
     packages=['mpw'],
-    install_requires=['pycrypto', 'scrypt', 'pythondialog'],
     python_requires='>=3',
+    install_requires=['pycrypto', 'scrypt'],
+    extras_require={
+        'dialog': ['pythondialog']
+    },
 
     entry_points={
         'console_scripts': [
-            'mpw=mpw.mpw:main'
+            'mpw = mpw.mpw:main'
         ]
     }
 )

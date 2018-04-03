@@ -6,15 +6,19 @@ and I wanted to try writing my own (unofficial) version of it.
 
 ## Installation
 
-Setting up pympw is easy.
+Setting up pympw is pretty straightforward.
 
 	$ git clone https://github.com/jedevc/pympw.git
 	$ cd pympw
 	$ pip install .
 
-This installs the `mpw` command. If you want a launcher as well, simply copy
-one of the .desktop files from `data/applications/' to a location that your
-desktop environment will read.
+This installs the core `mpw` command. If you want to use `mpw dialog` then you
+should install the package with dialog support.
+
+	$ pip install .[dialog]
+
+To install a desktop launcher, simply copy one of the .desktop files from
+`data/applications/' to a location that your desktop environment will read.
 
 	$ cp data/applications/mpw.desktop ~/.local/share/applications/
 

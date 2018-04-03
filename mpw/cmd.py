@@ -21,8 +21,6 @@ import subprocess
 from getpass import getpass
 from shutil import get_terminal_size
 
-import dialog
-
 from . import algorithm
 
 def generate(name, version, site, template, counter, stdout, clipboard):
@@ -92,6 +90,8 @@ def prompt(name, version, site, template, counter, stdout, clipboard, loop):
         if not loop: break
 
 def dprompt(name, version, site, template, counter, stdout, clipboard, loop):
+    import dialog
+
     d = dialog.Dialog()
 
     offset = 10

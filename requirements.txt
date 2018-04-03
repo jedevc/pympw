@@ -1,3 +1,6 @@
+# Dependencies
 scrypt
 pycrypto
-pythondialog
+
+# Optional dependencies
+# pythondialog
