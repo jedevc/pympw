@@ -17,7 +17,6 @@
 #
 # =============================================================================
 
-import subprocess
 from getpass import getpass
 from shutil import get_terminal_size
 
@@ -206,5 +205,6 @@ def clipboard_copy(data):
         data: The data to copy to the clipboard.
     '''
 
-    proc = subprocess.run(['xsel', '-bi'], input=data.encode('utf8'))
-    proc.check_returncode()
+    import pyperclip
+
+    pyperclip.copy(data)

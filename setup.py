@@ -18,7 +18,7 @@ setup(
     python_requires='>=3',
     install_requires=['pycrypto', 'scrypt'],
     extras_require={
-        'dialog': ['pythondialog']
+        'full': ['pyperclip', 'pythondialog']
     },
 
     entry_points={
