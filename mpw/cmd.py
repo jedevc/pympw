@@ -39,21 +39,29 @@ def generate(name, version, site, template, counter, stdout, clipboard):
     return site_password
 
 def prompt(name, version, site, template, counter, stdout, clipboard, loop):
-    # details prompt
-    while not name or len(name) == 0:
-        name = input('Name: ')
+    # input helper function
+    def input_conditional(prompt, condition, default = None, type = str):
+        while True:
+            if default:
+                value = input('{} ({}): '.format(prompt, default)) or default
+            else:
+                value = input('{}: '.format(prompt))
 
-    while not version or not 0 <= version <= 3:
-        try:
-            version = int(input('Version (3): ') or 3)
-        except ValueError:
-            continue
+            try:
+                value = type(value)
+            except ValueError:
+                continue
+
+            if condition(value): return value
+
+    # details prompt
+    name = input_conditional('Name', lambda x: len(x) != 0, name)
+    version = input_conditional('Version', lambda x: 0 <= x <= 3, version, int)
 
     # password prompt
     while True:
         password = getpass('Master Password: ')
-        if len(password) != 0:
-            break
+        if len(password) != 0: break
 
     # setup master password
     gen = algorithm.Algorithm(version)
@@ -64,17 +72,10 @@ def prompt(name, version, site, template, counter, stdout, clipboard, loop):
         print('-' * cols)
 
         # site prompt
-        while not site or len(site) == 0:
-            site = input('Site: ')
-
-        while template not in algorithm.TEMPLATE_TYPES.keys():
-            template = input('Template (long): ') or 'long'
-
-        while not counter:
-            try:
-                counter = int(input('Counter (1): ') or 1)
-            except ValueError:
-                continue
+        site = input_conditional('Site', lambda x: len(x) != 0, site)
+        template = input_conditional('Template',
+                lambda x: x in algorithm.TEMPLATE_TYPES.keys(), template)
+        counter = input_conditional('Counter', lambda x: True, 1, int)
 
         site_seed = gen.site_seed(key, site, counter)
         site_password = gen.site_password(site_seed, template)

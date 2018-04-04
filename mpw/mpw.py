@@ -51,13 +51,13 @@ def main(*arglist):
             help='Generate a password with the help of a prompt')
     prompt.set_defaults(func=cmd.prompt)
     prompt.add_argument('-n', '--name', help='Your full name')
-    prompt.add_argument('-v', '--version', type=int,
+    prompt.add_argument('-v', '--version', type=int, default=3,
             choices=[0, 1, 2, 3], help='MasterPassword algorithm version')
     prompt.add_argument('-s', '--site', help='The site name')
-    prompt.add_argument('-t', '--template',
+    prompt.add_argument('-t', '--template', default='long',
             choices=algorithm.TEMPLATE_TYPES.keys(),
             help='The password type template')
-    prompt.add_argument('-c', '--counter', type=int,
+    prompt.add_argument('-c', '--counter', type=int, default=1,
             help="The site's password counter")
     prompt.add_argument('-p', '--stdout', action='store_true',
             help='Print the password to stdout')
