@@ -32,18 +32,18 @@ def Algorithm(version):
     '''
 
     if version == 0:
-        return AlgorithmV0
+        return AlgorithmV0()
     elif version == 1:
-        return AlgorithmV1
+        return AlgorithmV1()
     elif version == 2:
-        return AlgorithmV2
+        return AlgorithmV2()
     elif version == 3:
-        return AlgorithmV3
+        return AlgorithmV3()
     else:
         raise ValueError('invalid version')
 
 class AlgorithmBase:
-    def master_key(master_password, salt_string):
+    def generate_key(self, master_password, salt_string):
         '''
         Generate the master key.
 
@@ -55,40 +55,44 @@ class AlgorithmBase:
             The master key.
         '''
 
-        pass
+        return self._master_key(master_password, salt_string)
 
-    def site_seed(key, site, counter):
+    def generate_password(self, key, site, counter, template_type):
         '''
-        Generate a site password generation seed.
+        Generate a site password.
 
         Args:
             key: The master key.
             site: The site's name.
             counter: The password version to generate.
+            template_type: The type of password to generate.
+
+        Returns:
+            The generated site password.
         '''
 
+        seed = self._site_seed(key, site, counter)
+        return self._site_password(seed, template_type)
+
+    # protected methods for subclasses to override
+    def _master_key(self, master_password, salt_string):
         pass
 
-    def site_password(seed, template_type):
-        '''
-        Generate a site password.
+    def _site_seed(self, key, site, counter):
+        pass
 
-        Args:
-            seed: The password generation seed.
-            template_type: The type of password to generate.
-        '''
-
+    def _site_password(self, seed, template_type):
         pass
 
 class AlgorithmV0(AlgorithmBase):
-    def master_key(master_password, salt_string):
+    def _master_key(self, master_password, salt_string):
         salt = utf8(PACKAGE_NAME) + \
                uint_32(len(salt_string)) + \
                utf8(salt_string)
         key = scrypt.hash(utf8(master_password), salt, 32768, 8, 2, 64)
         return key
 
-    def site_seed(key, site, counter):
+    def _site_seed(self, key, site, counter):
         msg = utf8(PACKAGE_NAME) + \
               uint_32(len(site)) + \
               utf8(site) + \
@@ -96,7 +100,7 @@ class AlgorithmV0(AlgorithmBase):
         seed = HMAC.new(key, msg, SHA256).digest()
         return seed
 
-    def site_password(seed, template_type):
+    def _site_password(self, seed, template_type):
         seed = list(seed)
         for i, v in enumerate(seed):
             # ported this operation from js to python
@@ -118,7 +122,7 @@ class AlgorithmV0(AlgorithmBase):
         return ''.join(password)
 
 class AlgorithmV1(AlgorithmV0):
-    def site_password(seed, template_type):
+    def _site_password(self, seed, template_type):
         templates = TEMPLATE_TYPES[template_type]
         template = templates[seed[0] % len(templates)]
 
@@ -134,7 +138,7 @@ class AlgorithmV1(AlgorithmV0):
         return ''.join(password)
 
 class AlgorithmV2(AlgorithmV1):
-    def site_seed(key, site, counter):
+    def _site_seed(self, key, site, counter):
         msg = utf8(PACKAGE_NAME) + \
               uint_32(len(utf8(site))) + \
               utf8(site) + \
@@ -143,7 +147,7 @@ class AlgorithmV2(AlgorithmV1):
         return seed
 
 class AlgorithmV3(AlgorithmV2):
-    def master_key(master_password, salt_string):
+    def _master_key(self, master_password, salt_string):
         salt = utf8(PACKAGE_NAME) + \
                uint_32(len(utf8(salt_string))) + \
                utf8(salt_string)

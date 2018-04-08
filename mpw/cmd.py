@@ -26,9 +26,8 @@ def generate(name, version, site, template, counter, stdout, clipboard):
     password = getpass('Master Password: ')
 
     gen = algorithm.Algorithm(version)
-    key = gen.master_key(password, name)
-    site_seed = gen.site_seed(key, site, counter)
-    site_password = gen.site_password(site_seed, template)
+    key = gen.generate_key(password, name)
+    site_password = gen.generate_password(key, site, counter, template)
 
     if stdout:
         print('Site Password: "{}"'.format(site_password))
@@ -65,7 +64,7 @@ def prompt(name, version, site, template, counter, stdout, clipboard, loop):
 
     # setup master password
     gen = algorithm.Algorithm(version)
-    key = gen.master_key(password, name)
+    key = gen.generate_key(password, name)
 
     while True:
         cols = get_terminal_size()[0]
@@ -77,8 +76,7 @@ def prompt(name, version, site, template, counter, stdout, clipboard, loop):
                 lambda x: x in algorithm.TEMPLATE_TYPES.keys(), template)
         counter = input_conditional('Counter', lambda x: True, 1, int)
 
-        site_seed = gen.site_seed(key, site, counter)
-        site_password = gen.site_password(site_seed, template)
+        site_password = gen.generate_password(key, site, counter, template)
 
         # output
         if stdout:
@@ -139,7 +137,7 @@ def dprompt(name, version, site, template, counter, stdout, clipboard, loop):
 
     # setup master password
     gen = algorithm.Algorithm(version)
-    key = gen.master_key(password, name)
+    key = gen.generate_key(password, name)
 
     old_site = site
     old_template = template
@@ -177,8 +175,7 @@ def dprompt(name, version, site, template, counter, stdout, clipboard, loop):
             if errors:
                 d.msgbox('\n'.join(errors))
             else:
-                site_seed = gen.site_seed(key, site, counter)
-                site_password = gen.site_password(site_seed, template)
+                site_password = gen.generate_password(key, site, counter, template)
 
                 # output
                 messages = []
