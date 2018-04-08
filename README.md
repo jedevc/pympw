@@ -1,8 +1,7 @@
 # pympw
 
-pympw is a master password generation tool based on
-[Master Password](https://github.com/Lyndir/MasterPassword). I loved the idea,
-and I wanted to try writing my own (unofficial) version of it.
+pympw is a master password generation tool that relies on the [Master
+Password](https://github.com/Lyndir/MasterPassword) algorithm.
 
 ## Installation
 
