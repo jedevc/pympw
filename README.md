@@ -74,9 +74,9 @@ to manage multiple projects that way.
 	# install dependencies
 	$ pip install -r requirements.txt
 
-To run pympw, simply run ```python main.py``` with appropriate arguments.
+To run pympw, execute ```python -m mpw``` with appropriate arguments.
+To run the tests, execute ```python -m unittest```.
 
 ## Goals
 
 - Storage of site data
-- Add tests
