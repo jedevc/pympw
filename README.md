@@ -78,4 +78,5 @@ To run the tests, execute ```python -m unittest```.
 
 ## Goals
 
+- Key expiry for prompts
 - Storage of site data
