@@ -73,7 +73,7 @@ def prompt(name, version, site, template, counter, stdout, clipboard, loop):
         # site prompt
         site = input_conditional('Site', lambda x: len(x) != 0, site)
         template = input_conditional('Template',
-                lambda x: x in algorithm.TEMPLATE_TYPES.keys(), template)
+                lambda x: x in algorithm.TEMPLATE_TYPES, template)
         counter = input_conditional('Counter', lambda x: True, 1, int)
 
         site_password = gen.generate_password(key, site, counter, template)
@@ -165,8 +165,9 @@ def dprompt(name, version, site, template, counter, stdout, clipboard, loop):
             if len(site) == 0:
                 errors.append('Must input a sitename.')
                 site = old_site
-            if template not in algorithm.TEMPLATE_TYPES.keys():
-                errors.append('Must input a valid template type.')
+            if template not in algorithm.TEMPLATE_TYPES:
+                valid = ', '.join(algorithm.TEMPLATE_TYPES.keys())
+                errors.append('Must input a valid template type. Must be one of {}.'.format(valid))
                 template = old_template
             if counter is None:
                 errors.append('Must input a counter value.')

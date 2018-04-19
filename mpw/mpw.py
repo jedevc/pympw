@@ -37,7 +37,7 @@ def main(*arglist):
             choices=[0, 1, 2, 3], help='MasterPassword algorithm version')
     generate.add_argument('site', help='The site name')
     generate.add_argument('-t', '--template', default='long',
-            choices=algorithm.TEMPLATE_TYPES.keys(),
+            choices=algorithm.TEMPLATE_TYPES,
             help='The password type template')
     generate.add_argument('-c', '--counter', type=int, default=1,
             help="The site's password counter")
@@ -55,7 +55,7 @@ def main(*arglist):
             choices=[0, 1, 2, 3], help='MasterPassword algorithm version')
     prompt.add_argument('-s', '--site', help='The site name')
     prompt.add_argument('-t', '--template', default='long',
-            choices=algorithm.TEMPLATE_TYPES.keys(),
+            choices=algorithm.TEMPLATE_TYPES,
             help='The password type template')
     prompt.add_argument('-c', '--counter', type=int, default=1,
             help="The site's password counter")
@@ -75,7 +75,7 @@ def main(*arglist):
             choices=[0, 1, 2, 3], help='MasterPassword algorithm version')
     dialog.add_argument('-s', '--site', default='', help='The site name')
     dialog.add_argument('-t', '--template', default='long',
-            choices=algorithm.TEMPLATE_TYPES.keys(),
+            choices=algorithm.TEMPLATE_TYPES,
             help='The password type template')
     dialog.add_argument('-c', '--counter', type=int, default=1,
             help="The site's password counter")
