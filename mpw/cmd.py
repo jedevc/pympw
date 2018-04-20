@@ -167,7 +167,7 @@ def dprompt(name, version, site, template, counter, stdout, clipboard, loop):
                 site = old_site
             if template not in algorithm.TEMPLATE_TYPES:
                 valid = ', '.join(algorithm.TEMPLATE_TYPES.keys())
-                errors.append('Must input a valid template type. Must be one of {}.'.format(valid))
+                errors.append('Must input a valid template type ({}).'.format(valid))
                 template = old_template
             if counter is None:
                 errors.append('Must input a counter value.')
