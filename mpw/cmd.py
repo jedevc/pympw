@@ -107,6 +107,10 @@ class DialogPrompt:
         self.offset = 10
 
     def run(self):
+        '''
+        Display the dialog, allowing some basic back-and-forward navigation.
+        '''
+
         while True:
             if not self.login(): return
             if not self.password(): continue
@@ -116,6 +120,15 @@ class DialogPrompt:
                 if not self.loop: return
 
     def login(self):
+        '''
+        Get and store the login details.
+
+        Returns:
+            True on a success.
+            False on a cancellation.
+        '''
+
+        # set defaults
         self.name = self.default_name
         self.version = self.default_version
 
@@ -151,26 +164,47 @@ class DialogPrompt:
         return True
 
     def password(self):
+        '''
+        Get and store the master password.
+
+        Returns:
+            True on a success.
+            False on a cancellation.
+        '''
+
         while True:
+            # input password
             status, password = self.dialog.passwordbox('Enter your master password.', insecure=True)
             if status != self.dialog.OK: return False
 
+            # error message
             if len(password) == 0:
                 self.dialog.msgbox('Must input a master password.')
             else:
                 break
 
+        # calculate master key
         self.generator = algorithm.Algorithm(self.version)
         self.key = self.generator.generate_key(password, self.name)
 
         return True
 
     def generate(self):
+        '''
+        Get the site details and display the site password.
+
+        Returns:
+            True on a success.
+            False on a cancellation.
+        '''
+
+        # set defaults
         self.site = self.default_site
         self.template = self.default_template
         self.counter = self.default_counter
         
         while True:
+            # input entries
             status, elements = self.dialog.form('Enter the site details.', [
                 ('Site', 1, 0, self.site, 1, self.offset, 128, 0),
                 ('Template', 2, 0, self.template, 2, self.offset, 128, 0),
@@ -202,6 +236,7 @@ class DialogPrompt:
             if errors:
                 self.dialog.msgbox('\n'.join(errors))
             else:
+                # calculate site password
                 site_password = self.generator.generate_password(self.key, self.site, self.counter, self.template)
 
                 # output
