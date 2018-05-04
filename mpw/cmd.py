@@ -107,12 +107,13 @@ class DialogPrompt:
         self.offset = 10
 
     def run(self):
-        self.login()
-        self.password()
-
         while True:
-            self.generate()
-            if not self.loop: break
+            if not self.login(): return
+            if not self.password(): continue
+
+            while True:
+                if not self.generate(): break
+                if not self.loop: return
 
     def login(self):
         self.name = self.default_name
@@ -124,7 +125,7 @@ class DialogPrompt:
                 ('Name', 1, 0, self.name, 1, self.offset, 128, 0),
                 ('Version', 2, 0, str(self.version), 2, self.offset, 4, 0)
             ])
-            if status != self.dialog.OK: return
+            if status != self.dialog.OK: return False
 
             # parse entries
             self.name = elements[0]
@@ -147,10 +148,12 @@ class DialogPrompt:
             else:
                 break
 
+        return True
+
     def password(self):
         while True:
             status, password = self.dialog.passwordbox('Enter your master password.', insecure=True)
-            if status != self.dialog.OK: return
+            if status != self.dialog.OK: return False
 
             if len(password) == 0:
                 self.dialog.msgbox('Must input a master password.')
@@ -159,6 +162,8 @@ class DialogPrompt:
 
         self.generator = algorithm.Algorithm(self.version)
         self.key = self.generator.generate_key(password, self.name)
+
+        return True
 
     def generate(self):
         self.site = self.default_site
@@ -171,7 +176,7 @@ class DialogPrompt:
                 ('Template', 2, 0, self.template, 2, self.offset, 128, 0),
                 ('Counter', 3, 0, str(self.counter), 3, self.offset, 128, 0)
             ])
-            if status != self.dialog.OK: return
+            if status != self.dialog.OK: return False
 
             # parse entries
             self.site = elements[0]
@@ -210,6 +215,8 @@ class DialogPrompt:
                 if messages: self.dialog.msgbox('\n'.join(messages))
 
                 break
+
+        return True
 
 def dprompt(*args, **kwargs):
     dp = DialogPrompt(*args, **kwargs)
