@@ -37,9 +37,62 @@ def generate(name, version, site, template, counter, stdout, clipboard):
 
     return site_password
 
-def prompt(name, version, site, template, counter, stdout, clipboard, loop):
-    # input helper function
-    def input_conditional(prompt, condition, default = None, type = str):
+class Prompt:
+    def __init__(self, name, version, site, template, counter, stdout, clipboard, loop):
+        self.name = self.default_name = name
+        self.version = self.default_version = version
+        self.site = self.default_site = site
+        self.template = self.default_template = template
+        self.counter = self.default_counter = counter
+
+        self.stdout = stdout
+        self.clipboard = clipboard
+        self.loop = loop
+
+        self.generator = None
+        self.key = None
+
+    def run(self):
+        self.login()
+        self.password()
+
+        while True:
+            cols = get_terminal_size()[0]
+            print('-' * cols)
+
+            self.generate()
+
+            if not self.loop: break
+
+    def login(self):
+        self.name = self._input_conditional('Name', lambda x: len(x) != 0, self.default_name)
+        self.version = self._input_conditional('Version', lambda x: 0 <= x <= 3, self.default_version, int)
+
+    def password(self):
+        while True:
+            password = getpass('Master Password: ')
+            if len(password) != 0: break
+
+        self.generator = algorithm.Algorithm(self.version)
+        self.key = self.generator.generate_key(password, self.name)
+
+    def generate(self):
+        self.site = self._input_conditional('Site', lambda x: len(x) != 0,
+                self.default_site)
+        self.template = self._input_conditional('Template',
+                lambda x: x in algorithm.TEMPLATE_TYPES, self.default_template)
+        self.counter = self._input_conditional('Counter', lambda x: True, self.default_counter, int)
+
+        site_password = self.generator.generate_password(self.key, self.site, self.counter, self.template)
+
+        # output
+        if self.stdout:
+            print('Site Password: "{}"'.format(site_password))
+        if self.clipboard:
+            print('Copied to clipboard.')
+            clipboard_copy(site_password)
+
+    def _input_conditional(self, prompt, condition, default = None, type = str):
         while True:
             if default:
                 value = input('{} ({}): '.format(prompt, default)) or default
@@ -53,39 +106,9 @@ def prompt(name, version, site, template, counter, stdout, clipboard, loop):
 
             if condition(value): return value
 
-    # details prompt
-    name = input_conditional('Name', lambda x: len(x) != 0, name)
-    version = input_conditional('Version', lambda x: 0 <= x <= 3, version, int)
-
-    # password prompt
-    while True:
-        password = getpass('Master Password: ')
-        if len(password) != 0: break
-
-    # setup master password
-    gen = algorithm.Algorithm(version)
-    key = gen.generate_key(password, name)
-
-    while True:
-        cols = get_terminal_size()[0]
-        print('-' * cols)
-
-        # site prompt
-        site = input_conditional('Site', lambda x: len(x) != 0, site)
-        template = input_conditional('Template',
-                lambda x: x in algorithm.TEMPLATE_TYPES, template)
-        counter = input_conditional('Counter', lambda x: True, 1, int)
-
-        site_password = gen.generate_password(key, site, counter, template)
-
-        # output
-        if stdout:
-            print('Site Password: "{}"'.format(site_password))
-        if clipboard:
-            print('Copied to clipboard.')
-            clipboard_copy(site_password)
-
-        if not loop: break
+def prompt(*args, **kwargs):
+    p = Prompt(*args, **kwargs)
+    p.run()
 
 class DialogPrompt:
     def __init__(self, name, version, site, template, counter, stdout, clipboard, loop):
