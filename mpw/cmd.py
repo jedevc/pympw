@@ -37,7 +37,11 @@ def generate(name, version, site, template, counter, stdout, clipboard):
 
     return site_password
 
-class Prompt:
+class PromptInterface:
+    '''
+    Base class for all Prompt-like interfaces for password generation.
+    '''
+
     def __init__(self, name, version, site, template, counter, stdout, clipboard, loop):
         self.name = self.default_name = name
         self.version = self.default_version = version
@@ -51,83 +55,6 @@ class Prompt:
 
         self.generator = None
         self.key = None
-
-    def run(self):
-        self.login()
-        self.password()
-
-        while True:
-            cols = get_terminal_size()[0]
-            print('-' * cols)
-
-            self.generate()
-
-            if not self.loop: break
-
-    def login(self):
-        self.name = self._input_conditional('Name', lambda x: len(x) != 0, self.default_name)
-        self.version = self._input_conditional('Version', lambda x: 0 <= x <= 3, self.default_version, int)
-
-    def password(self):
-        while True:
-            password = getpass('Master Password: ')
-            if len(password) != 0: break
-
-        self.generator = algorithm.Algorithm(self.version)
-        self.key = self.generator.generate_key(password, self.name)
-
-    def generate(self):
-        self.site = self._input_conditional('Site', lambda x: len(x) != 0,
-                self.default_site)
-        self.template = self._input_conditional('Template',
-                lambda x: x in algorithm.TEMPLATE_TYPES, self.default_template)
-        self.counter = self._input_conditional('Counter', lambda x: True, self.default_counter, int)
-
-        site_password = self.generator.generate_password(self.key, self.site, self.counter, self.template)
-
-        # output
-        if self.stdout:
-            print('Site Password: "{}"'.format(site_password))
-        if self.clipboard:
-            print('Copied to clipboard.')
-            clipboard_copy(site_password)
-
-    def _input_conditional(self, prompt, condition, default = None, type = str):
-        while True:
-            if default:
-                value = input('{} ({}): '.format(prompt, default)) or default
-            else:
-                value = input('{}: '.format(prompt))
-
-            try:
-                value = type(value)
-            except ValueError:
-                continue
-
-            if condition(value): return value
-
-def prompt(*args, **kwargs):
-    p = Prompt(*args, **kwargs)
-    p.run()
-
-class DialogPrompt:
-    def __init__(self, name, version, site, template, counter, stdout, clipboard, loop):
-        self.name = self.default_name = name
-        self.version = self.default_version = version
-        self.site = self.default_site = site
-        self.template = self.default_template = template
-        self.counter = self.default_counter = counter
-
-        self.stdout = stdout
-        self.clipboard = clipboard
-        self.loop = loop
-
-        self.generator = None
-        self.key = None
-
-        import dialog
-        self.dialog = dialog.Dialog()
-        self.offset = 10
 
     def run(self):
         '''
@@ -151,6 +78,104 @@ class DialogPrompt:
             False on a cancellation.
         '''
 
+        pass
+
+    def password(self):
+        '''
+        Get and store the master password.
+
+        Returns:
+            True on a success.
+            False on a cancellation.
+        '''
+
+        pass
+
+    def generate(self):
+        '''
+        Get the site details and display the site password.
+
+        Returns:
+            True on a success.
+            False on a cancellation.
+        '''
+
+        pass
+
+class Prompt(PromptInterface):
+    def login(self):
+        self.name = self._input_conditional('Name', lambda x: len(x) != 0, self.default_name)
+        self.version = self._input_conditional('Version', lambda x: 0 <= x <= 3, self.default_version, int)
+
+        return True
+
+    def password(self):
+        while True:
+            password = getpass('Master Password: ')
+            if len(password) != 0: break
+
+        self.generator = algorithm.Algorithm(self.version)
+        self.key = self.generator.generate_key(password, self.name)
+
+        return True
+
+    def generate(self):
+        cols = get_terminal_size()[0]
+        print('-' * cols)
+
+        self.site = self._input_conditional('Site', lambda x: len(x) != 0,
+                self.default_site)
+        self.template = self._input_conditional('Template',
+                lambda x: x in algorithm.TEMPLATE_TYPES, self.default_template)
+        self.counter = self._input_conditional('Counter', lambda x: True, self.default_counter, int)
+
+        site_password = self.generator.generate_password(self.key, self.site, self.counter, self.template)
+
+        # output
+        if self.stdout:
+            print('Site Password: "{}"'.format(site_password))
+        if self.clipboard:
+            print('Copied to clipboard.')
+            clipboard_copy(site_password)
+
+        return True
+
+    def _input_conditional(self, prompt, condition, default = None, type = str):
+        while True:
+            if default:
+                value = input('{} ({}): '.format(prompt, default)) or default
+            else:
+                value = input('{}: '.format(prompt))
+
+            try:
+                value = type(value)
+            except ValueError:
+                continue
+
+            if condition(value): return value
+
+def prompt(*args, **kwargs):
+    p = Prompt(*args, **kwargs)
+    p.run()
+
+class DialogPrompt(PromptInterface):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        import dialog
+        self.dialog = dialog.Dialog()
+        self.offset = 10
+
+    def run(self):
+        while True:
+            if not self.login(): return
+            if not self.password(): continue
+
+            while True:
+                if not self.generate(): break
+                if not self.loop: return
+
+    def login(self):
         # set defaults
         self.name = self.default_name
         self.version = self.default_version
@@ -187,14 +212,6 @@ class DialogPrompt:
         return True
 
     def password(self):
-        '''
-        Get and store the master password.
-
-        Returns:
-            True on a success.
-            False on a cancellation.
-        '''
-
         while True:
             # input password
             status, password = self.dialog.passwordbox('Enter your master password.', insecure=True)
@@ -213,14 +230,6 @@ class DialogPrompt:
         return True
 
     def generate(self):
-        '''
-        Get the site details and display the site password.
-
-        Returns:
-            True on a success.
-            False on a cancellation.
-        '''
-
         # set defaults
         self.site = self.default_site
         self.template = self.default_template
