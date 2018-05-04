@@ -37,6 +37,14 @@ def generate(name, version, site, template, counter, stdout, clipboard):
 
     return site_password
 
+def prompt(*args, **kwargs):
+    p = Prompt(*args, **kwargs)
+    p.run()
+
+def dprompt(*args, **kwargs):
+    dp = DialogPrompt(*args, **kwargs)
+    dp.run()
+
 class PromptInterface:
     '''
     Base class for all Prompt-like interfaces for password generation.
@@ -53,8 +61,8 @@ class PromptInterface:
         self.clipboard = clipboard
         self.loop = loop
 
-        self.generator = None
-        self.key = None
+        self.master_password = None
+        self.site_password = None
 
     def run(self):
         '''
@@ -65,8 +73,14 @@ class PromptInterface:
             if not self.login(): return
             if not self.password(): continue
 
+            generator = algorithm.Algorithm(self.version)
+            key = generator.generate_key(self.master_password, self.name)
+
             while True:
-                if not self.generate(): break
+                if not self.site_details(): break
+                self.site_password = generator.generate_password(key, self.site, self.counter, self.template)
+                self.display()
+
                 if not self.loop: return
 
     def login(self):
@@ -91,9 +105,20 @@ class PromptInterface:
 
         pass
 
-    def generate(self):
+    def site_details(self):
         '''
-        Get the site details and display the site password.
+        Get and store the site details.
+
+        Returns:
+            True on a success.
+            False on a cancellation.
+        '''
+
+        pass
+
+    def display(self):
+        '''
+        Display the site password.
 
         Returns:
             True on a success.
@@ -104,22 +129,21 @@ class PromptInterface:
 
 class Prompt(PromptInterface):
     def login(self):
-        self.name = self._input_conditional('Name', lambda x: len(x) != 0, self.default_name)
-        self.version = self._input_conditional('Version', lambda x: 0 <= x <= 3, self.default_version, int)
+        self.name = self._input_conditional('Name', lambda x: len(x) != 0,
+                self.default_name)
+        self.version = self._input_conditional('Version',
+                lambda x: 0 <= x <= 3, self.default_version, int)
 
         return True
 
     def password(self):
         while True:
-            password = getpass('Master Password: ')
-            if len(password) != 0: break
-
-        self.generator = algorithm.Algorithm(self.version)
-        self.key = self.generator.generate_key(password, self.name)
+            self.master_password = getpass('Master Password: ')
+            if len(self.master_password) != 0: break
 
         return True
 
-    def generate(self):
+    def site_details(self):
         cols = get_terminal_size()[0]
         print('-' * cols)
 
@@ -127,16 +151,17 @@ class Prompt(PromptInterface):
                 self.default_site)
         self.template = self._input_conditional('Template',
                 lambda x: x in algorithm.TEMPLATE_TYPES, self.default_template)
-        self.counter = self._input_conditional('Counter', lambda x: True, self.default_counter, int)
+        self.counter = self._input_conditional('Counter', lambda x: True,
+                self.default_counter, int)
 
-        site_password = self.generator.generate_password(self.key, self.site, self.counter, self.template)
+        return True
 
-        # output
+    def display(self):
         if self.stdout:
-            print('Site Password: "{}"'.format(site_password))
+            print('Site Password: "{}"'.format(self.site_password))
         if self.clipboard:
             print('Copied to clipboard.')
-            clipboard_copy(site_password)
+            clipboard_copy(self.site_password)
 
         return True
 
@@ -154,10 +179,6 @@ class Prompt(PromptInterface):
 
             if condition(value): return value
 
-def prompt(*args, **kwargs):
-    p = Prompt(*args, **kwargs)
-    p.run()
-
 class DialogPrompt(PromptInterface):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -165,15 +186,6 @@ class DialogPrompt(PromptInterface):
         import dialog
         self.dialog = dialog.Dialog()
         self.offset = 10
-
-    def run(self):
-        while True:
-            if not self.login(): return
-            if not self.password(): continue
-
-            while True:
-                if not self.generate(): break
-                if not self.loop: return
 
     def login(self):
         # set defaults
@@ -214,22 +226,18 @@ class DialogPrompt(PromptInterface):
     def password(self):
         while True:
             # input password
-            status, password = self.dialog.passwordbox('Enter your master password.', insecure=True)
+            status, self.master_password = self.dialog.passwordbox('Enter your master password.', insecure=True)
             if status != self.dialog.OK: return False
 
             # error message
-            if len(password) == 0:
+            if len(self.master_password) == 0:
                 self.dialog.msgbox('Must input a master password.')
             else:
                 break
 
-        # calculate master key
-        self.generator = algorithm.Algorithm(self.version)
-        self.key = self.generator.generate_key(password, self.name)
-
         return True
 
-    def generate(self):
+    def site_details(self):
         # set defaults
         self.site = self.default_site
         self.template = self.default_template
@@ -268,26 +276,20 @@ class DialogPrompt(PromptInterface):
             if errors:
                 self.dialog.msgbox('\n'.join(errors))
             else:
-                # calculate site password
-                site_password = self.generator.generate_password(self.key, self.site, self.counter, self.template)
-
-                # output
-                messages = []
-                if self.stdout:
-                    msg = 'Site Password: "{}"'.format(site_password)
-                    messages.append(msg)
-                if self.clipboard:
-                    messages.append('Copied to clipboard.')
-                    clipboard_copy(site_password)
-                if messages: self.dialog.msgbox('\n'.join(messages))
 
                 break
 
         return True
 
-def dprompt(*args, **kwargs):
-    dp = DialogPrompt(*args, **kwargs)
-    dp.run()
+    def display(self):
+        messages = []
+        if self.stdout:
+            msg = 'Site Password: "{}"'.format(self.site_password)
+            messages.append(msg)
+        if self.clipboard:
+            messages.append('Copied to clipboard.')
+            clipboard_copy(self.site_password)
+        if messages: self.dialog.msgbox('\n'.join(messages))
 
 def clipboard_copy(data):
     '''
