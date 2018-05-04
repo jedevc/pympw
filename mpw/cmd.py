@@ -87,114 +87,133 @@ def prompt(name, version, site, template, counter, stdout, clipboard, loop):
 
         if not loop: break
 
-def dprompt(name, version, site, template, counter, stdout, clipboard, loop):
-    import dialog
+class DialogPrompt:
+    def __init__(self, name, version, site, template, counter, stdout, clipboard, loop):
+        self.name = self.default_name = name
+        self.version = self.default_version = version
+        self.site = self.default_site = site
+        self.template = self.default_template = template
+        self.counter = self.default_counter = counter
 
-    d = dialog.Dialog()
+        self.stdout = stdout
+        self.clipboard = clipboard
+        self.loop = loop
 
-    offset = 10
+        self.generator = None
+        self.key = None
 
-    # details dialog
-    old_name = name
-    old_version = version
-    while True:
-        status, elements = d.form('Enter your login details.', [
-            ('Name', 1, 0, name, 1, offset, 128, 0),
-            ('Version', 2, 0, str(version), 2, offset, 4, 0)
-        ])
-        if status != d.OK: return
+        import dialog
+        self.dialog = dialog.Dialog()
+        self.offset = 10
 
-        # parse entries
-        name = elements[0]
-        try:
-            version = int(elements[1])
-        except ValueError:
-            version = None
+    def run(self):
+        self.login()
+        self.password()
 
-        # error messages
-        errors = []
-        if len(name) == 0:
-            errors.append('Must input a name.')
-            name = old_name
-        if not version or not 0 <= version <= 3:
-            errors.append('Must input a valid version number (0, 1, 2, 3).')
-            version = old_version
-
-        if errors:
-            d.msgbox('\n'.join(errors))
-        else:
-            break
-
-    # password dialog
-    while True:
-        status, password = d.passwordbox('Enter your master password.', insecure=True)
-        if status != d.OK: return
-
-        if len(password) == 0:
-            d.msgbox('Must input a master password.')
-        else:
-            break
-
-    # setup master password
-    gen = algorithm.Algorithm(version)
-    key = gen.generate_key(password, name)
-
-    old_site = site
-    old_template = template
-    old_counter = counter
-    while True:
-        # site dialog
         while True:
-            status, elements = d.form('Enter the site details.', [
-                ('Site', 1, 0, site, 1, offset, 128, 0),
-                ('Template', 2, 0, template, 2, offset, 128, 0),
-                ('Counter', 3, 0, str(counter), 3, offset, 128, 0)
+            self.generate()
+            if not self.loop: break
+
+    def login(self):
+        self.name = self.default_name
+        self.version = self.default_version
+
+        while True:
+            # get entries
+            status, elements = self.dialog.form('Enter your login details.', [
+                ('Name', 1, 0, self.name, 1, self.offset, 128, 0),
+                ('Version', 2, 0, str(self.version), 2, self.offset, 4, 0)
             ])
-            if status != d.OK: return
+            if status != self.dialog.OK: return
 
             # parse entries
-            site = elements[0]
-            template = elements[1]
+            self.name = elements[0]
             try:
-                counter = int(elements[2])
+                self.version = int(elements[1])
             except ValueError:
-                counter = None
+                self.version = None
 
             # error messages
             errors = []
-            if len(site) == 0:
-                errors.append('Must input a sitename.')
-                site = old_site
-            if template not in algorithm.TEMPLATE_TYPES:
-                valid = ', '.join(algorithm.TEMPLATE_TYPES.keys())
-                errors.append('Must input a valid template type ({}).'.format(valid))
-                template = old_template
-            if counter is None:
-                errors.append('Must input a counter value.')
-                counter = old_counter
+            if len(self.name) == 0:
+                errors.append('Must input a name.')
+                self.name = self.default_name
+            if self.version is None or not 0 <= self.version <= 3:
+                errors.append('Must input a valid version number (0, 1, 2, 3).')
+                self.version = self.default_version
 
             if errors:
-                d.msgbox('\n'.join(errors))
+                self.dialog.msgbox('\n'.join(errors))
             else:
-                site_password = gen.generate_password(key, site, counter, template)
+                break
+
+    def password(self):
+        while True:
+            status, password = self.dialog.passwordbox('Enter your master password.', insecure=True)
+            if status != self.dialog.OK: return
+
+            if len(password) == 0:
+                self.dialog.msgbox('Must input a master password.')
+            else:
+                break
+
+        self.generator = algorithm.Algorithm(self.version)
+        self.key = self.generator.generate_key(password, self.name)
+
+    def generate(self):
+        self.site = self.default_site
+        self.template = self.default_template
+        self.counter = self.default_counter
+        
+        while True:
+            status, elements = self.dialog.form('Enter the site details.', [
+                ('Site', 1, 0, self.site, 1, self.offset, 128, 0),
+                ('Template', 2, 0, self.template, 2, self.offset, 128, 0),
+                ('Counter', 3, 0, str(self.counter), 3, self.offset, 128, 0)
+            ])
+            if status != self.dialog.OK: return
+
+            # parse entries
+            self.site = elements[0]
+            self.template = elements[1]
+            try:
+                self.counter = int(elements[2])
+            except ValueError:
+                self.counter = None
+
+            # error messages
+            errors = []
+            if len(self.site) == 0:
+                errors.append('Must input a sitename.')
+                self.site = self.default_site
+            if self.template not in algorithm.TEMPLATE_TYPES:
+                valid = ', '.join(algorithm.TEMPLATE_TYPES.keys())
+                errors.append('Must input a valid template type ({}).'.format(valid))
+                self.template = self.default_template
+            if self.counter is None:
+                errors.append('Must input a counter value.')
+                self.counter = self.default_counter
+
+            if errors:
+                self.dialog.msgbox('\n'.join(errors))
+            else:
+                site_password = self.generator.generate_password(self.key, self.site, self.counter, self.template)
 
                 # output
                 messages = []
-                if stdout:
+                if self.stdout:
                     msg = 'Site Password: "{}"'.format(site_password)
                     messages.append(msg)
-                if clipboard:
+                if self.clipboard:
                     messages.append('Copied to clipboard.')
                     clipboard_copy(site_password)
-                if messages: d.msgbox('\n'.join(messages))
-
-                site = old_site
-                template = old_template
-                counter = old_counter
+                if messages: self.dialog.msgbox('\n'.join(messages))
 
                 break
 
-        if not loop: break
+def dprompt(*args, **kwargs):
+    dp = DialogPrompt(*args, **kwargs)
+    dp.run()
 
 def clipboard_copy(data):
     '''
