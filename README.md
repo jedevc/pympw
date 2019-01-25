@@ -9,7 +9,7 @@ Setting up pympw is pretty straightforward.
 
 	$ git clone https://github.com/jedevc/pympw.git
 	$ cd pympw
-	$ pip install .[full]
+	$ pip install .
 
 To install a desktop launcher, simply copy one of the .desktop files from
 `data/applications/' to a location that your desktop environment will read.

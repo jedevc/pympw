@@ -16,10 +16,7 @@ setup(
 
     packages=['mpw'],
     python_requires='>=3',
-    install_requires=['pycrypto', 'scrypt'],
-    extras_require={
-        'full': ['pyperclip', 'pythondialog']
-    },
+    install_requires=['pycrypto', 'scrypt', 'pyperclip', 'pythondialog'],
 
     entry_points={
         'console_scripts': [
